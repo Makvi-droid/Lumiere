@@ -1,0 +1,66 @@
+:root{
+    --font: 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway', 'Ubuntu';
+}
+
+footer {
+    background-color: #1e1e2e; 
+    color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    top: 2em;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.footer-section {
+    flex: 1;
+    margin: 10px;
+    min-width: 200px;
+}
+
+.footer-section h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-family: 'Lora', var(--font);
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section p{
+    font-family: 'Poppins', var(--font);
+}
+
+.footer-section ul li {
+    margin: 8px 0;
+    font-family: 'Poppins', var(--font);
+}
+
+.footer-section ul li a {
+    color: whitesmoke; 
+    text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+    text-decoration: underline;
+}
+
+.social-icons a {
+    margin: 0 10px;
+    color: #ffffff; 
+    font-size: 24px;
+    transition: 0.3s;
+}
+
+.social-icons a:hover {
+    color: #ffb703;
+}

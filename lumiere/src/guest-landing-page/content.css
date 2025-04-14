@@ -1,0 +1,146 @@
+:root{
+    --font: 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway', 'Ubuntu';
+}
+
+.body-content {
+    background-color: #1a1a2e; 
+    padding: 50px 0;
+    color: white;
+}
+
+.content {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between; 
+    gap: 50px; 
+    padding: 50px 10%; 
+}
+
+
+.right-content {
+    flex: 1;
+    text-align: left;
+}
+
+.right-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px; 
+    font-family: 'Playfair', var(--font);
+}
+
+.right-content h4 {
+    font-size: 1.2rem;
+    margin-bottom: 20px; 
+    font-family: 'Cinzel', var(--font);
+}
+
+.right-content p {
+    font-size: 1rem;
+    line-height: 1.8; 
+    margin-bottom: 30px; 
+    font-family: 'Montserrat', var(--font);
+}
+
+
+.left-content {
+    flex: 1; 
+    display: flex;
+    justify-content: center; 
+}
+
+.left-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+
+.shop-btn {
+    color: black;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    transition: 0.3s;
+}
+
+.shop-btn:hover{
+    background-color: #ebf21f;
+    color: #1d3557;
+}
+
+
+@media screen and (max-width: 1024px) {
+    .content {
+        flex-direction: column; 
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+        padding: 40px 5%;
+    }
+
+    .right-content {
+        text-align: center;
+    }
+
+    .right-content h1 {
+        font-size: 2rem;
+    }
+
+    .right-content h4 {
+        font-size: 1.1rem;
+    }
+
+    .right-content p {
+        font-size: 0.95rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content {
+        padding: 30px 5%;
+        gap: 20px;
+    }
+
+    .right-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .right-content h4 {
+        font-size: 1rem;
+    }
+
+    .right-content p {
+        font-size: 0.9rem;
+    }
+
+    .shop-btn {
+        font-size: 1rem;
+        padding: 10px 18px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .right-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .right-content h4 {
+        font-size: 0.9rem;
+    }
+
+    .right-content p {
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .shop-btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+}
+
+
+
+

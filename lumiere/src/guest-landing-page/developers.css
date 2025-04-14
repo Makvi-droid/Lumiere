@@ -1,0 +1,124 @@
+:root{
+    --font: 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway', 'Ubuntu';
+}
+
+
+.developers-container {
+    text-align: center;
+    padding: 50px;
+    background-color: #f8f8f8;
+}
+
+
+.developers-title {
+    font-size: 2.5rem;
+    color: #1d3557;
+    margin-bottom: 30px;
+    font-family: 'DM Serif Display', var(--font);
+    letter-spacing: 1px;
+}
+
+
+.developers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+
+.developer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+
+.developer-img {
+    width: auto;
+    height: 25vh;
+    object-fit: contain;
+    border-radius: 10px;
+    border: 3px solid #1d3557;
+}
+
+
+.developer-name {
+    margin-top: 10px;
+    font-size: 1.2rem;
+    color: #333;
+    font-family: 'Montserrat', var(--font);
+}
+
+
+
+@media screen and (max-width: 1024px) {
+    .developers-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 80%;
+    }
+
+    .developer-img {
+        height: 22vh;
+    }
+
+    .developers-title {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .developers-grid {
+        grid-template-columns: 1fr;
+        max-width: 90%;
+    }
+
+    .developer-img {
+        height: 20vh;
+    }
+
+    .developers-title {
+        font-size: 1.8rem;
+    }
+
+    .developer-name {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .developers-container {
+        padding: 30px;
+    }
+
+    .developers-title {
+        font-size: 1.6rem;
+    }
+
+    .developers-grid {
+        gap: 15px;
+    }
+
+    .developer-img {
+        height: 18vh;
+    }
+
+    .developer-name {
+        font-size: 0.9rem;
+    }
+}
+
+
+
+
+
+
+
+
+
+
