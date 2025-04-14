@@ -1,0 +1,203 @@
+:root{
+    --font: 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway', 'Ubuntu';
+}
+
+.aboutUs-content {
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    gap: 40px; 
+    padding: 50px;
+}
+
+.aboutUs-right-content {
+    flex: 1; 
+    display: flex;
+    justify-content: center;
+}
+
+#video {
+    width: 100%;
+    max-width: 500px; 
+    border-radius: 10px; 
+}
+
+.aboutUs-left-content {
+    flex: 1; 
+    text-align: left;
+}
+
+.aboutUs-left-content h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-family: 'Lora', var(--font);
+}
+
+.aboutUs-left-content p {
+    font-size: 1rem;
+    line-height: 1.6; 
+    text-align: justify;
+    font-family: 'Raleway', var(--font);
+}
+
+.aboutUs-cards {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    gap: 2em; 
+    flex-wrap: wrap; 
+    padding: 40px 20px; 
+}
+
+.card {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+    padding: 20px;
+    background: #1a1a2e; 
+    border-radius: 10px; 
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 
+    max-width: 350px; 
+    height: 40vh;
+    width: auto;
+}
+
+.card img {
+    width: 100px; 
+    height: auto;
+    margin-bottom: 15px; 
+}
+
+.sub-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #DAA520; 
+    font-family: 'Titillium Web', var(--font);
+}
+
+.card p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5; 
+    color: aliceblue;
+    font-family: 'Poppins', var(--font);
+}
+
+@media screen and (max-width: 1024px) {
+    .aboutUs-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+        padding: 40px 5%;
+    }
+
+    .aboutUs-left-content {
+        text-align: center;
+    }
+
+    .aboutUs-left-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .aboutUs-left-content p {
+        font-size: 0.95rem;
+    }
+
+    .aboutUs-right-content {
+        justify-content: center;
+    }
+
+    #video {
+        max-width: 400px;
+    }
+
+    .aboutUs-cards {
+        gap: 1.5em;
+    }
+
+    .card {
+        max-width: 300px;
+        height: auto;
+        padding: 15px;
+    }
+
+    .sub-title {
+        font-size: 1.3rem;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .aboutUs-content {
+        padding: 30px 5%;
+    }
+
+    .aboutUs-left-content h1 {
+        font-size: 1.6rem;
+    }
+
+    .aboutUs-left-content p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    #video {
+        max-width: 350px;
+    }
+
+    .card {
+        max-width: 280px;
+    }
+
+    .sub-title {
+        font-size: 1.2rem;
+    }
+
+    .card p {
+        font-size: 0.85rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .aboutUs-content {
+        gap: 20px;
+        padding: 20px 5%;
+    }
+
+    .aboutUs-left-content h1 {
+        font-size: 1.4rem;
+    }
+
+    .aboutUs-left-content p {
+        font-size: 0.85rem;
+    }
+
+    #video {
+        max-width: 100%;
+    }
+
+    .aboutUs-cards {
+        gap: 1em;
+        padding: 20px 10px;
+    }
+
+    .card {
+        max-width: 100%;
+        height: auto;
+        padding: 10px;
+    }
+
+    .sub-title {
+        font-size: 1.1rem;
+    }
+
+    .card p {
+        font-size: 0.8rem;
+    }
+}
+

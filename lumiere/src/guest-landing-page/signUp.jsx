@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./signUp.css";
 import register from "./assets/register.svg";
 import log from "./assets/log.svg";
@@ -6,26 +7,39 @@ import log from "./assets/log.svg";
 function SignUp() {
     const [signUpMode, setSignUpMode] = useState(false);
 
+    const navigate = useNavigate()
+
+    const handleLogin = (e) => {
+    e.preventDefault()
+   
+    navigate("/User") // Redirect to homepage
+  }
     return (
         <div className={`container ${signUpMode ? "sign-up-mode" : ""}`}>
             <div className="forms-container">
                 <div className="signin-signup">
                     
-                    <form action="#" className="sign-in-form">
+                    <form onSubmit={handleLogin} className="sign-in-form">
                         <h2 className="title">Sign in</h2>
                         <div className="input-field">
                             <i className="fas fa-user"></i>
-                            <input type="text" placeholder="Username" />
+                            <input type="text" placeholder="Username" required/>
+                            <div className="invalid-feedback">
+                                Username Required!
+                            </div>
                         </div>
                         <div className="input-field">
                             <i className="fas fa-lock"></i>
-                            <input type="password" placeholder="Password" />
+                            <input type="password" placeholder="Password" required/>
+                            <div className="invalid-feedback">
+                                Password Required!
+                            </div>
                         </div>
                         <input type="submit" value="Login" className="btn solid" />
                     </form>
 
                     {/* Sign-up Form */}
-                    <form action="#" className="sign-up-form">
+                    <form onSubmit={""} className="sign-up-form">
                         <h2 className="title">Sign up</h2>
                         <div className="input-field">
                             <i className="fas fa-user"></i>

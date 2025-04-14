@@ -1,0 +1,115 @@
+:root{
+    --font: 'Roboto', 'Open Sans', 'Montserrat', 'Poppins', 'Raleway', 'Ubuntu';
+}
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+img{
+    height: 10vh;
+    width: auto;
+}
+
+header{
+    padding: 0.5em;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Raleway', var(--font);
+}
+
+.nav-ul {
+    position: sticky;
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    flex-grow: 1; 
+    justify-content: center; 
+    text-decoration: none;
+}
+
+.nav-ul li {
+    cursor: pointer;
+    font-size: 1.3rem;
+   
+    text-decoration: none;
+}
+
+.nav-ul li a{
+    text-decoration: none;
+    color: #1d3557;
+    transition: 0.3s;
+}
+.nav-ul li a:hover{
+    background-color: #1d3557;
+    color: #ebf21f;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.nav-ul li:hover{
+    background-color: #1d3557;
+    color: #ebf21f;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.nav-icons a i{
+    cursor: pointer;
+    transition: 0.3s;
+    color: #1d3557;
+}
+
+.nav-icons {
+    display: flex;
+    gap: 25px;
+    font-size: 1.6rem;
+    
+}
+
+.nav-icons i:hover{
+    background-color: #1d3557;
+    color: #ebf21f;
+    padding: 8px;
+    border-radius: 10px;
+}
+
+@media (max-width: 1024px) {
+    .nav-ul {
+        gap: 10px; 
+    }
+
+    .nav-ul li {
+        font-size: 1.1rem; 
+    }
+
+    .nav-icons {
+        font-size: 1.4rem; 
+        gap: 15px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+        padding: 1em 0;
+        background-color: #f8f9fa; 
+    }
+
+    .nav-ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-icons {
+        margin-top: 10px;
+        font-size: 1.4rem;
+    }
+}
