@@ -8,29 +8,27 @@ import Developers from './developers.jsx';
 import Footer from './footer.jsx';
 import SignUp from './signUp.jsx';
 
-
-function Guest() {
+function Guest({ setCurrentUser }) {
   const signUpRef = useRef(null); 
 
   const scrollToSignUp = () => {
-      signUpRef.current?.scrollIntoView({ behavior: "smooth" });
+    signUpRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    
     <>
-        <Navbar scrollToSignUp={scrollToSignUp} />
-        <Content />
-        <AboutUs />
-        <Product />  
-        <ContactUs />
-        <Developers />
-        <div ref={signUpRef}>
-          <SignUp />
-        </div>
-        <Footer />
+      <Navbar scrollToSignUp={scrollToSignUp} />
+      <div ref={signUpRef}>
+        <SignUp setCurrentUser={setCurrentUser} />
+      </div>
+      <Content />
+      <AboutUs />
+      <Product />
+      <ContactUs />
+      <Developers />
+      <Footer />
     </>
-  )
+  );
 }
 
 export default Guest;

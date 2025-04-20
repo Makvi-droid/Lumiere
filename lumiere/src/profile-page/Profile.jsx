@@ -1,11 +1,14 @@
+import { Outlet } from 'react-router-dom';
+import Navbar from '../user-landing-page/navbar';
+import UserProfile from './userProfile';
 
-import Navbar from "../user-landing-page/navbar.jsx";
 
 function Profile(){
     return(
         <>
             <Navbar/>
-            
+            <UserProfile/>
+            <Outlet/>
         </>
     );
 }

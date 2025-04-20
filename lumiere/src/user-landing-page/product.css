@@ -58,6 +58,10 @@
     font-family: 'Poppins', var(--font);
 }
 
+#price p{
+    color: #1e1e2e;
+}
+
 .add{
     height: 3em;
     width: auto;

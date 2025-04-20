@@ -1,4 +1,6 @@
+import React from 'react';
 import './product.css';
+
 import ring1 from './assets/ring1.jpg';
 import ring2 from './assets/ring2.jpg';
 import ring3 from './assets/ring3.jpg';
@@ -11,12 +13,14 @@ import earrings1 from './assets/earrings1.jpg';
 import earrings2 from './assets/earrings2.jpg';
 import earrings3 from './assets/earrings3.jpg';
 
+
+
 function Product(){
     return(
         <>
             <div className="products">
                 <h1 className='product-h1'>Products</h1>
-                <div className="product-container">
+                <div className="product-container" id='price'>
                     <div className="product-card">
                         <img src={ring1} alt="Celestia"/>
                         <h2>Celestia</h2>
@@ -70,7 +74,7 @@ function Product(){
                     <div className="product-card">
                         <img src={earrings3} alt="Soulmate Studs"/>
                         <h2>Soulmate Studs</h2>
-                        <p className='price'>259.99 php</p>
+                        <p className="price" >259.99 php</p>
                         <button className='add'>Add to cart</button>
                     </div>
                 </div>

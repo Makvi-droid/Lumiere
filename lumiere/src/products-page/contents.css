@@ -9,7 +9,7 @@
     padding: 2rem;
 }
 
-.product-card {
+#product-card {
     background-color: white;
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -17,7 +17,7 @@
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
-    width: auto;
+
 }
 
 .product-card:hover {
@@ -38,7 +38,7 @@
 .price {
     padding: 0 1rem;
     font-weight: bold;
-    color: #ff4500;
+    color: #ebf21f;
     margin-bottom: 0.5rem;
 }
 
@@ -111,7 +111,7 @@
 .detail-price {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #ff4500;
+    color: #ebf21f;
     margin: 1rem 0;
 }
 
