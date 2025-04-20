@@ -20,7 +20,7 @@ function Necklaces() {
                 data-name="Celestial Halo" 
                 data-price="1900.00" 
                 data-image="ring_sample.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -40,7 +40,7 @@ function Necklaces() {
                 data-id="2" 
                 data-name="Moonstone Mirage" 
                 data-price="5000.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -60,7 +60,7 @@ function Necklaces() {
                 data-id="3" 
                 data-name="Eternal Bloom" 
                 data-price="2500.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -80,7 +80,7 @@ function Necklaces() {
                 data-id="4" 
                 data-name="Aurora Twist" 
                 data-price="3000.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -100,7 +100,7 @@ function Necklaces() {
                 data-id="5" 
                 data-name="Crystal Embrace" 
                 data-price="4500.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -120,7 +120,7 @@ function Necklaces() {
                 data-id="6" 
                 data-name="Moonstone Mirage" 
                 data-price="5000.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -140,7 +140,7 @@ function Necklaces() {
                 data-id="7" 
                 data-name="Eternal Bloom" 
                 data-price="2500.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -160,7 +160,7 @@ function Necklaces() {
                 data-id="8" 
                 data-name="Aurora Twist" 
                 data-price="3000.00">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>

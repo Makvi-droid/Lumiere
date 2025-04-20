@@ -20,7 +20,7 @@ function Rings() {
                 data-name="Celestial Halo" 
                 data-price="1900.00" 
                 data-image="ring_sample.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -41,7 +41,7 @@ function Rings() {
                 data-name="Moonstone Mirage" 
                 data-price="5000.00"
                 data-image="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -62,7 +62,7 @@ function Rings() {
                 data-name="Eternal Bloom" 
                 data-price="2500.00"
                 data-image="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -83,7 +83,7 @@ function Rings() {
                 data-name="Aurora Twist" 
                 data-price="3000.00"
                 data-image="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -104,7 +104,7 @@ function Rings() {
                 data-name="Crystal Embrace" 
                 data-price="4500.00"
                 data-image="https://www.prouds.com.au/content/products/9ct-gold-diamond-heart-ring-8641228-188554.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -125,7 +125,7 @@ function Rings() {
                 data-name="Moonstone Mirage" 
                 data-price="5000.00"
                 data-image="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -146,7 +146,7 @@ function Rings() {
                 data-name="Eternal Bloom" 
                 data-price="2500.00"
                 data-image="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
@@ -167,7 +167,7 @@ function Rings() {
                 data-name="Aurora Twist" 
                 data-price="3000.00"
                 data-image="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg">
-                More Info
+                Add To Cart
               </button>
             </div>
           </div>
