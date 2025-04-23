@@ -21,4 +21,11 @@
   .delete-btn:focus {
     outline: none;
   }
+
+  #profileImage{
+    object-fit: cover;
+    width: auto;
+    height: 12em;
+    border-radius: 10px;
+  }
   
