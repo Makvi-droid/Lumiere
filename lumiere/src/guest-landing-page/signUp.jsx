@@ -33,9 +33,15 @@ function SignUp({ setCurrentUser }) {
     );
 
     if (user) {
-      setCurrentUser(user); // Set the logged-in user
+      // Store the user in localStorage to persist across page refreshes
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      // Set the logged-in user
+      setCurrentUser(user);
       setErrorMessage('');
-      navigate(user.role === 'admin' ? "/Admin" : "/User"); // Redirect based on role
+      
+      // Redirect based on role
+      navigate(user.role === 'admin' ? "/Admin" : "/User");
     } else {
       setErrorMessage('Invalid username or password');
     }
@@ -61,8 +67,13 @@ function SignUp({ setCurrentUser }) {
     const newUser = { id: users.length + 1, username, password, role: "customer" };
     users.push(newUser); // You should eventually add logic to persist the users array
     
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    // Set the current user
+    setCurrentUser(newUser);
+    
     setErrorMessage('');
-    setSignUpMode(false); // Switch to login after successful sign-up
+    navigate("/User"); // Switch to login after successful sign-up
   };
 
   return (

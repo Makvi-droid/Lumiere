@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from './cartContext';
 import './userProfile.css';
+import { useNavigate } from 'react-router-dom'; 
+import Profile from './assets/profile.jpg'
 
 function UserProfile() {
     const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+    const navigate = useNavigate(); // Initialize navigate function
     
+    // Get current user from localStorage
+    const getCurrentUser = () => {
+        try {
+            const userJson = localStorage.getItem('currentUser');
+            return userJson ? JSON.parse(userJson) : null;
+        } catch (error) {
+            console.error("Error parsing currentUser from localStorage:", error);
+            return null;
+        }
+    };
+    
+    const currentUser = getCurrentUser();
+    
+    // Use currentUser data if available, otherwise use default values
     const [userData, setUserData] = useState({
-        name: "Sarah Johnson",
-        email: "sarah.johnson@example.com",
+        name: currentUser?.username || "Guest",
         phone: "+639876543210",
         address: "Quezon, City",
     });
@@ -18,6 +34,17 @@ function UserProfile() {
         confirmPassword: '',
     });
 
+    // Update userData when currentUser changes
+    useEffect(() => {
+        const user = getCurrentUser();
+        if (user) {
+            setUserData(prevData => ({
+                ...prevData,
+                name: user.username,
+                email: user.email || prevData.email,
+            }));
+        }
+    }, []);
     
     const handleProfileChange = (e) => {
         const { id, value } = e.target;
@@ -68,6 +95,20 @@ function UserProfile() {
         
         displayToast("Order placed successfully!");
         clearCart();
+    };
+
+    // Logout function
+    const handleLogout = () => {
+        // Clear user data from localStorage
+        localStorage.removeItem('currentUser');
+                
+        // Show notification
+        displayToast("Logged out successfully");
+        
+        // Navigate to the guest page 
+        setTimeout(() => {
+            navigate('/'); 
+        }); 
     };
 
     const displayToast = (message, type = 'success') => {
@@ -175,12 +216,14 @@ function UserProfile() {
                                     <h4 className="mb-0">My Profile</h4>
                                 </div>
                                 <div className="profile-body p-4 text-center">
-                                    <div className="profile-img-container mb-3">
-                                        <img src="https://i.pinimg.com/originals/f5/8a/ac/f58aacd2cddf1a32e2701ba767184f3c.jpg" alt="Profile Image" className="profile-img rounded-circle" id="profileImage" />
+                                <div className="profile-img-container mb-3">
+                                        <img src={Profile} alt="Profile Image" className="profile-img" id="profileImage" />
                                     </div>
                                     <h3 className="profile-name" id="userName">{userData.name}</h3>
                                     <p className="profile-email text-muted" id="userEmail">{userData.email}</p>
-
+                                    {currentUser?.role && (
+                                        <span className="badge bg-info text-dark mb-2">{currentUser.role}</span>
+                                    )}
                                     <div className="profile-stats d-flex justify-content-around my-4">
                                         <div className="text-center">
                                             <div className="stat-number fw-bold fs-4">3</div>
@@ -196,7 +239,7 @@ function UserProfile() {
                                     <div className="d-grid gap-2 mt-4">
                                         <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
                                         <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
-                                        <button className="btn btn-outline-danger">Logout</button>
+                                        <button className="btn btn-outline-danger" onClick={handleLogout}>Logout</button>
                                     </div>
                                 </div>
                             </div>
@@ -262,53 +305,47 @@ function UserProfile() {
                                 <p className="item-total mb-0 fw-bold">₱{(item.price * item.quantity).toFixed(2)}</p>
                             </div>
                                 <div className="col-md-1 col-12 text-md-end text-end mt-md-0 mt-3">
-                                                        <button 
-                                                            className="delete-btn btn btn-sm btn-outline-danger"
-                                                            onClick={() => handleRemoveItem(item.id)}
-                                                        >
-                                                            <i className="fa-solid fa-trash"></i>
-                                                        </button>
-                                                        </div>
-
-
-                                                    </div>
-                                                </div>
-                                            ))}
-
-                                            <div className="cart-summary p-3 bg-light rounded mt-4">
-                                                <div className="row align-items-center">
-                                                    <div className="col-md-6">
-                                                        <h5 className="mb-0">
-                                                            Total Items: <span className="badge bg-primary">
-                                                                {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-                                                            </span>
-                                                        </h5>
-                                                    </div>
-                                                    <div className="col-md-6 text-md-end mt-md-0 mt-3">
-                                                        <h5 className="mb-3">
-                                                            Total: <span className="text-warning fw-bold">
-                                                                ₱{getTotalPrice().toFixed(2)}
-                                                            </span>
-                                                        </h5>
-                                                        <div className="btn-group">
-                                                            <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
-                                                            <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    <button 
+                                        className="delete-btn btn btn-sm btn-outline-danger"
+                                        onClick={() => handleRemoveItem(item.id)}
+                                    >
+                                        <i className="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
-                </div> 
-                            
-                            
-              
-</div>         
-            </section>
-            
-        </>
+                        </div>
+                    ))}
+
+                    <div className="cart-summary p-3 bg-light rounded mt-4">
+                        <div className="row align-items-center">
+                            <div className="col-md-6">
+                                <h5 className="mb-0">
+                                    Total Items: <span className="badge bg-primary">
+                                        {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                                    </span>
+                                </h5>
+                            </div>
+                            <div className="col-md-6 text-md-end mt-md-0 mt-3">
+                                <h5 className="mb-3">
+                                    Total: <span className="text-warning fw-bold">
+                                        ₱{getTotalPrice().toFixed(2)}
+                                    </span>
+                                </h5>
+                                <div className="btn-group">
+                                    <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
+                                    <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    </div>
+                </div>                       
+            </div>         
+        </section>            
+    </>
     );
 }
 

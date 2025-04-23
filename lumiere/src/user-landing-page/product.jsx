@@ -1,5 +1,9 @@
-import React from 'react';
 import './product.css';
+import React, { useState } from 'react';
+import { useCart } from '../profile-page/cartContext';
+import Rings from '../products-page/rings';
+import Bracelets from '../products-page/Bracelets';
+import Necklaces from '../products-page/necklaces';
 
 import ring1 from './assets/ring1.jpg';
 import ring2 from './assets/ring2.jpg';
@@ -16,69 +20,36 @@ import earrings3 from './assets/earrings3.jpg';
 
 
 function Product(){
+     const { addToCart } = useCart();
+      const [showModal, setShowModal] = useState(false);
+      const [selectedProduct, setSelectedProduct] = useState(null);
+      
+      const handleAddToCartClick = (productData) => {
+        setSelectedProduct({
+          id: productData.getAttribute('data-id'),
+          name: productData.getAttribute('data-name'),
+          price: productData.getAttribute('data-price'),
+          image: productData.getAttribute('data-image')
+        });
+        setShowModal(true);
+      };
+      
+      const confirmAddToCart = () => {
+        addToCart(selectedProduct);
+        setShowModal(false);
+        // Optional: Show toast notification instead of alert
+        const toastElement = document.getElementById('addToCartToast');
+        if (toastElement) {
+          const bsToast = new window.bootstrap.Toast(toastElement);
+          bsToast.show();
+        }
+      };
+
     return(
         <>
-            <div className="products">
-                <h1 className='product-h1'>Products</h1>
-                <div className="product-container" id='price'>
-                    <div className="product-card">
-                        <img src={ring1} alt="Celestia"/>
-                        <h2>Celestia</h2>
-                        <p className='price'>199.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={ring2} alt="Aurora Glow"/>
-                        <h2>Aurora Glow</h2>
-                        <p className='price'>149.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={ring3} alt="Sapphire Whisper"/>
-                        <h2>Sapphire Whisper</h2>
-                        <p className='price'>299.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-
-                    <div className="product-card">
-                        <img src={necklace1} alt="Regal Charm"/>
-                        <h2>Regal Charm</h2>
-                        <p className='price'>249.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={necklace2} alt="Velvet Shine"/>
-                        <h2>Velvet Shine</h2>
-                        <p className='price'>199.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={necklace3} alt="Celestial Grace"/>
-                        <h2>Celestial Grace</h2>
-                        <p className='price'>179.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-
-                    <div className="product-card">
-                        <img src={earrings1} alt="Amour Spark"/>
-                        <h2>Amour Spark</h2>
-                        <p className='price'>129.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={earrings2} alt="Sapphire Starlight"/>
-                        <h2>Sapphire Starlight</h2>
-                        <p className='price'>99.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                    <div className="product-card">
-                        <img src={earrings3} alt="Soulmate Studs"/>
-                        <h2>Soulmate Studs</h2>
-                        <p className="price" >259.99 php</p>
-                        <button className='add'>Add to cart</button>
-                    </div>
-                </div>
-            </div>
+           <Rings/>
+            <Bracelets/>
+            <Necklaces/>
         </>
     );
 }
