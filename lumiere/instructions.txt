@@ -1,0 +1,15 @@
+download lumiere folder
+
+open folder in vs code
+
+open cmd
+
+navigate to folder:
+{
+cd saved_folder or depending where u saved the folder
+cd lumiere
+}
+
+when navigated to main folder(lumiere):
+type in cmd: npm run dev
+hold ctrl + click link
