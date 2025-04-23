@@ -1,5 +1,7 @@
 download lumiere folder
 
+extract folder 
+
 open folder in vs code
 
 open cmd
