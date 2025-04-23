@@ -1,8 +1,5 @@
 
 import './product.css';
-import React, { useState } from 'react';
-import { useCart } from '../profile-page/cartContext';
-
 
 import ring1 from './assets/ring1.jpg';
 import ring2 from './assets/ring2.jpg';

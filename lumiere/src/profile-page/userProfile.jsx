@@ -86,8 +86,7 @@ function UserProfile() {
     };
 
     const handleCheckout = () => {
-        // Here you would implement checkout logic
-        // For now, we'll just show a message and clear the cart
+        
         if (cartItems.length === 0) {
             displayToast("Your cart is empty", "error");
             return;
@@ -273,7 +272,7 @@ function UserProfile() {
                             </div>
                             <div className="col-md-4 col-9">
                                 <h5 className="cart-item-title">{item.name}</h5>
-                                <p className="cart-item-price text-warning mb-0 fw-bold">₱{item.price}</p>
+                                <p className="cart-item-price mb-0 fw-bold">₱{item.price}</p>
                             </div>
                             <div className="col-md-3 col-6 mt-md-0 mt-3">
                             <div className="d-flex justify-content-between align-items-center">
@@ -327,7 +326,7 @@ function UserProfile() {
                             </div>
                             <div className="col-md-6 text-md-end mt-md-0 mt-3">
                                 <h5 className="mb-3">
-                                    Total: <span className="text-warning fw-bold">
+                                    Total: <span className="fw-bold">
                                         ₱{getTotalPrice().toFixed(2)}
                                     </span>
                                 </h5>

@@ -33,7 +33,7 @@ function Rings() {
       <h1 className="text-center mb-4">RINGS</h1>
       
       {/* Add to Cart Toast Notification */}
-      <div className="toast-container position-fixed bottom-0 end-0 p-3">
+      <div className="toast-container position-fixed top-0 end-0 p-3">
         <div id="addToCartToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
           <div className="toast-header">
             <strong className="me-auto">Shopping Cart</strong>
@@ -86,7 +86,7 @@ function Rings() {
         {/* Product 1 */}
         <div className="col-6 col-md-4 col-lg-3">
           <div className="card">
-            <img src="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640" className="card-img-top" alt="Celestial Halo Ring" />
+            <img src="https://images.pexels.com/photos/998521/pexels-photo-998521.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" className="card-img-top" alt="Celestial Halo Ring" />
             <div className="card-body p-2 d-flex flex-column">
               <h5 className="card-title">Celestial Halo</h5>
               <p className="card-text fw-bold text-warning mb-2">₱1900.00</p>
@@ -95,7 +95,7 @@ function Rings() {
                 data-id="1" 
                 data-name="Celestial Halo" 
                 data-price="1900.00" 
-                data-image="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640">
+                data-image="https://images.pexels.com/photos/998521/pexels-photo-998521.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
                 Add To Cart
               </button>
             </div>
