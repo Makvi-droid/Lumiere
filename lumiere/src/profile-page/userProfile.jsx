@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useCart } from './cartContext';
 import './userProfile.css';
 
 function UserProfile() {
+    const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+    
     const [userData, setUserData] = useState({
         name: "Sarah Johnson",
         email: "sarah.johnson@example.com",
@@ -15,27 +18,7 @@ function UserProfile() {
         confirmPassword: '',
     });
 
-    const [orders, setOrders] = useState([
-        {
-            id: 1,
-            item: "Crochet Blanket",
-            date: "2025-04-01",
-            status: "Shipped"
-        },
-        {
-            id: 2,
-            item: "Crochet Hat",
-            date: "2025-03-15",
-            status: "Delivered"
-        },
-        {
-            id: 3,
-            item: "Crochet Scarf",
-            date: "2025-02-28",
-            status: "Pending"
-        }
-    ]);
-
+    
     const handleProfileChange = (e) => {
         const { id, value } = e.target;
         setUserData((prevState) => ({
@@ -66,6 +49,27 @@ function UserProfile() {
         displayToast("Password updated successfully");
     };
 
+    const handleQuantityChange = (id, newQuantity) => {
+        updateQuantity(id, parseInt(newQuantity));
+    };
+
+    const handleRemoveItem = (id) => {
+        removeFromCart(id);
+        displayToast("Item removed from cart");
+    };
+
+    const handleCheckout = () => {
+        // Here you would implement checkout logic
+        // For now, we'll just show a message and clear the cart
+        if (cartItems.length === 0) {
+            displayToast("Your cart is empty", "error");
+            return;
+        }
+        
+        displayToast("Order placed successfully!");
+        clearCart();
+    };
+
     const displayToast = (message, type = 'success') => {
         const toast = document.getElementById('notificationToast');
         const toastMessage = document.getElementById('toastMessage');
@@ -81,7 +85,7 @@ function UserProfile() {
     return (
         <>
             {/* Toast Notification */}
-            <div className="toast-container">
+            <div className="toast-container position-fixed top-0 end-0 p-3">
                 <div id="notificationToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
                     <div className="toast-header">
                         <strong className="me-auto" id="toastTitle">Notification</strong>
@@ -103,19 +107,19 @@ function UserProfile() {
                         </div>
                         <div className="modal-body">
                             <form id="profileForm">
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="name" className="form-label">Full Name</label>
                                     <input type="text" className="form-control" id="name" value={userData.name} onChange={handleProfileChange} />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="email" className="form-label">Email Address</label>
                                     <input type="email" className="form-control" id="email" value={userData.email} onChange={handleProfileChange} />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="phone" className="form-label">Phone Number</label>
                                     <input type="tel" className="form-control" id="phone" value={userData.phone} onChange={handleProfileChange} />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="address" className="form-label">Shipping Address</label>
                                     <textarea className="form-control" id="address" rows="3" value={userData.address} onChange={handleProfileChange}></textarea>
                                 </div>
@@ -139,15 +143,15 @@ function UserProfile() {
                         </div>
                         <div className="modal-body">
                             <form id="passwordForm">
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="currentPassword" className="form-label">Current Password</label>
                                     <input type="password" className="form-control" id="currentPassword" value={passwords.currentPassword} onChange={handlePasswordChange} />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="newPassword" className="form-label">New Password</label>
                                     <input type="password" className="form-control" id="newPassword" value={passwords.newPassword} onChange={handlePasswordChange} />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-3">
                                     <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
                                     <input type="password" className="form-control" id="confirmPassword" value={passwords.confirmPassword} onChange={handlePasswordChange} />
                                 </div>
@@ -166,55 +170,144 @@ function UserProfile() {
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-4">
-                            <div className="profile-card">
-                                <img src="https://i.pinimg.com/originals/f5/8a/ac/f58aacd2cddf1a32e2701ba767184f3c.jpg" alt="Profile Image" className="profile-img" id="profileImage" />
-                                <h3 className="profile-name" id="userName">{userData.name}</h3>
-                                <p className="profile-email" id="userEmail">{userData.email}</p>
-
-                                <div className="profile-stats">
-                                    <div>
-                                        <div className="stat-number">3</div>
-                                        <div className="stat-label">Orders</div>
-                                    </div>
-                                    <div>
-                                        <div className="stat-number">0</div>
-                                        <div className="stat-label">Wishlist</div>
-                                    </div>
-                                    <div>
-                                        <div className="stat-number">1</div>
-                                        <div className="stat-label">Pending</div>
-                                    </div>
+                            <div className="profile-card shadow rounded">
+                                <div className="profile-header bg-primary text-white p-3 rounded-top">
+                                    <h4 className="mb-0">My Profile</h4>
                                 </div>
+                                <div className="profile-body p-4 text-center">
+                                    <div className="profile-img-container mb-3">
+                                        <img src="https://i.pinimg.com/originals/f5/8a/ac/f58aacd2cddf1a32e2701ba767184f3c.jpg" alt="Profile Image" className="profile-img rounded-circle" id="profileImage" />
+                                    </div>
+                                    <h3 className="profile-name" id="userName">{userData.name}</h3>
+                                    <p className="profile-email text-muted" id="userEmail">{userData.email}</p>
 
-                                <div className="d-grid gap-2 mt-4">
-                                    <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
-                                    <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
-                                    <button className="btn btn-outline-danger">Logout</button>
+                                    <div className="profile-stats d-flex justify-content-around my-4">
+                                        <div className="text-center">
+                                            <div className="stat-number fw-bold fs-4">3</div>
+                                            <div className="stat-label">Orders</div>
+                                        </div>
+                                        
+                                        <div className="text-center">
+                                            <div className="stat-number fw-bold fs-4">1</div>
+                                            <div className="stat-label">Pending</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="d-grid gap-2 mt-4">
+                                        <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
+                                        <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
+                                        <button className="btn btn-outline-danger">Logout</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div className="col-lg-8">
-                            <h2 className="section-title">Your Orders</h2>
-                            <div className="order-list">
-                                {orders.length === 0 ? (
-                                    <p>No orders yet.</p>
-                                ) : (
-                                    orders.map(order => (
-                                        <div key={order.id} className="order-item">
-                                            <div className="order-item-details">
-                                                <h5>{order.item}</h5>
-                                                <p>Date: {order.date}</p>
-                                                <p>Status: <strong>{order.status}</strong></p>
+    {/* Shopping Cart */}
+    <div className="p-3">
+        <h5 className="mb-3">Your Shopping Cart</h5>
+
+        {cartItems.length === 0 ? (
+            <div className="alert alert-info mb-0">
+                <div className="text-center py-4">
+                    <i className="bi bi-cart3 fs-1"></i>
+                    <h5 className="mt-3">Your shopping cart is empty</h5>
+                    <p className="text-muted">Browse our collection and add some beautiful items!</p>
+                </div>
+            </div>
+        ) : (
+            <div className="container px-0">
+                {cartItems.map(item => (
+                    <div key={item.id} className="mb-3 border rounded shadow-sm p-3">
+                        <div className="row align-items-center">
+                            <div className="col-md-2 col-3">
+                                <img 
+                                    src={item.image} 
+                                    alt={item.name} 
+                                    className="img-fluid rounded"
+                                    style={{ aspectRatio: '1/1', objectFit: 'cover' }}
+                                />
+                            </div>
+                            <div className="col-md-4 col-9">
+                                <h5 className="cart-item-title">{item.name}</h5>
+                                <p className="cart-item-price text-warning mb-0 fw-bold">₱{item.price}</p>
+                            </div>
+                            <div className="col-md-3 col-6 mt-md-0 mt-3">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <button 
+                                    className="btn btn-outline-secondary px-2" 
+                                    type="button"
+                                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                    disabled={item.quantity <= 1}
+                                >−</button>
+
+                                <input 
+                                    type="number" 
+                                    className="form-control mx-2 text-center"
+                                    style={{ maxWidth: "60px" }}
+                                    value={item.quantity} 
+                                    onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
+                                    min="1"
+                                />
+
+                                <button 
+                                    className="btn btn-outline-secondary px-2" 
+                                    type="button"
+                                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                >+</button>
+                            </div>
+                            </div>
+
+                            <div className="col-md-2 col-6 text-md-center mt-md-0 mt-3">
+                                <p className="item-total mb-0 fw-bold">₱{(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
+                                <div className="col-md-1 col-12 text-md-end text-end mt-md-0 mt-3">
+                                                        <button 
+                                                            className="delete-btn btn btn-sm btn-outline-danger"
+                                                            onClick={() => handleRemoveItem(item.id)}
+                                                        >
+                                                            <i className="fa-solid fa-trash"></i>
+                                                        </button>
+                                                        </div>
+
+
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            <div className="cart-summary p-3 bg-light rounded mt-4">
+                                                <div className="row align-items-center">
+                                                    <div className="col-md-6">
+                                                        <h5 className="mb-0">
+                                                            Total Items: <span className="badge bg-primary">
+                                                                {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                                                            </span>
+                                                        </h5>
+                                                    </div>
+                                                    <div className="col-md-6 text-md-end mt-md-0 mt-3">
+                                                        <h5 className="mb-3">
+                                                            Total: <span className="text-warning fw-bold">
+                                                                ₱{getTotalPrice().toFixed(2)}
+                                                            </span>
+                                                        </h5>
+                                                        <div className="btn-group">
+                                                            <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
+                                                            <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    ))
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                </div> 
+                            
+                            
+              
+</div>         
             </section>
+            
         </>
     );
 }
