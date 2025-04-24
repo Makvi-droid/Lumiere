@@ -4,6 +4,7 @@ import './userProfile.css';
 import { useNavigate } from 'react-router-dom'; 
 import Profile from './assets/profile.jpg'
 
+
 function UserProfile() {
     const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
     const navigate = useNavigate(); // Initialize navigate function
@@ -28,6 +29,27 @@ function UserProfile() {
         address: "Quezon, City",
     });
 
+    // Checkout form state
+    const [checkoutData, setCheckoutData] = useState({
+        fullName: currentUser?.username || "",
+        contactNumber: userData.phone || "",
+        location: "Quezon City"
+    });
+
+    // Available locations for dropdown
+    const locations = [
+        "Quezon City",
+        "Manila",
+        "Makati",
+        "Taguig",
+        "Pasig",
+        "Mandaluyong",
+        "Pasay",
+        "Parañaque",
+        "Caloocan",
+        "Marikina"
+    ];
+
     const [passwords, setPasswords] = useState({
         currentPassword: '',
         newPassword: '',
@@ -43,6 +65,11 @@ function UserProfile() {
                 name: user.username,
                 email: user.email || prevData.email,
             }));
+            
+            setCheckoutData(prevData => ({
+                ...prevData,
+                fullName: user.username || "",
+            }));
         }
     }, []);
     
@@ -57,6 +84,14 @@ function UserProfile() {
     const handlePasswordChange = (e) => {
         const { id, value } = e.target;
         setPasswords((prevState) => ({
+            ...prevState,
+            [id]: value,
+        }));
+    };
+
+    const handleCheckoutChange = (e) => {
+        const { id, value } = e.target;
+        setCheckoutData((prevState) => ({
             ...prevState,
             [id]: value,
         }));
@@ -86,12 +121,32 @@ function UserProfile() {
     };
 
     const handleCheckout = () => {
-        
         if (cartItems.length === 0) {
             displayToast("Your cart is empty", "error");
             return;
         }
         
+        // Instead of immediately checking out, show the checkout modal
+        const checkoutModal = new window.bootstrap.Modal(document.getElementById('checkoutModal'));
+        checkoutModal.show();
+    };
+
+    const processCheckout = () => {
+        // Validate checkout form
+        if (!checkoutData.fullName || !checkoutData.contactNumber || !checkoutData.location) {
+            displayToast("Please fill all checkout fields", "error");
+            return;
+        }
+
+        // Close modal
+        const checkoutModalElement = document.getElementById('checkoutModal');
+        const checkoutModal = window.bootstrap.Modal.getInstance(checkoutModalElement);
+        checkoutModal.hide();
+        
+        // Process the order with the checkout information
+        console.log("Processing order with info:", checkoutData);
+        
+        // Clear cart and show success message
         displayToast("Order placed successfully!");
         clearCart();
     };
@@ -205,6 +260,76 @@ function UserProfile() {
                 </div>
             </div>
 
+            {/* Checkout Modal */}
+            <div className="modal fade" id="checkoutModal" tabIndex="-1" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header bg-primary text-white">
+                            <h5 className="modal-title">Complete Your Order</h5>
+                            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <form id="checkoutForm">
+                                <div className="form-group mb-3">
+                                    <label htmlFor="fullName" className="form-label">Full Name</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        id="fullName" 
+                                        value={checkoutData.fullName} 
+                                        onChange={handleCheckoutChange}
+                                        placeholder="Enter your full name" 
+                                        required 
+                                    />
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label htmlFor="contactNumber" className="form-label">Contact Number</label>
+                                    <input 
+                                        type="tel" 
+                                        className="form-control" 
+                                        id="contactNumber" 
+                                        value={checkoutData.contactNumber} 
+                                        onChange={handleCheckoutChange}
+                                        placeholder="+63 XXX XXX XXXX" 
+                                        required 
+                                    />
+                                </div>
+                                <div className="form-group mb-3">
+                                    <label htmlFor="location" className="form-label">Delivery Location</label>
+                                    <select 
+                                        className="form-select" 
+                                        id="location" 
+                                        value={checkoutData.location} 
+                                        onChange={handleCheckoutChange}
+                                        required
+                                    >
+                                        {locations.map((location, index) => (
+                                            <option key={index} value={location}>{location}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h6>Order Summary</h6>
+                                    <div className="d-flex justify-content-between">
+                                        <span>Total Items:</span>
+                                        <span>{cartItems.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                                    </div>
+                                    <div className="d-flex justify-content-between fw-bold">
+                                        <span>Total Amount:</span>
+                                        <span>₱{getTotalPrice().toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-primary" onClick={processCheckout}>Place Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Profile and Order Information */}
             <section className="py-5">
                 <div className="container">
@@ -223,21 +348,11 @@ function UserProfile() {
                                     {currentUser?.role && (
                                         <span className="badge bg-info text-dark mb-2">{currentUser.role}</span>
                                     )}
-                                    <div className="profile-stats d-flex justify-content-around my-4">
-                                        <div className="text-center">
-                                            <div className="stat-number fw-bold fs-4">3</div>
-                                            <div className="stat-label">Orders</div>
-                                        </div>
-                                        
-                                        <div className="text-center">
-                                            <div className="stat-number fw-bold fs-4">1</div>
-                                            <div className="stat-label">Pending</div>
-                                        </div>
-                                    </div>
+                                   
 
                                     <div className="d-grid gap-2 mt-4">
                                         <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</button>
-                                        <button className="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</button>
+                                        
                                         <button className="btn btn-outline-danger" onClick={handleLogout}>Logout</button>
                                     </div>
                                 </div>
