@@ -283,31 +283,7 @@ function Rings() {
         </div>
       </div>
       
-      {/* Add CSS for hover effects */}
-      <style jsx>{`
-        .product-card {
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .product-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
-        }
-        
-        .product-image-container {
-          overflow: hidden;
-          border-top-left-radius: 0.375rem;
-          border-top-right-radius: 0.375rem;
-        }
-        
-        .product-image {
-          transition: transform 0.5s ease;
-        }
-        
-        .product-card:hover .product-image {
-          transform: scale(1.05);
-        }
-      `}</style>
+     
     </>
   );
 }
