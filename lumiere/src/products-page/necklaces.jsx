@@ -89,7 +89,7 @@ function Necklaces() {
           <div className="card">
             <img src="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640" className="card-img-top" alt="Celestial Halo Ring" />
             <div className="card-body p-2 d-flex flex-column">
-              <h5 className="card-title">Celestial Halo</h5>
+              <h5 className="card-title text">Celestial Halo</h5>
               <p className="card-text fw-bold text-warning mb-2">₱1900.00</p>
               <button className="btn btn-primary btn-sm mt-auto" 
                 onClick={(e) => handleAddToCartClick(e.currentTarget)}

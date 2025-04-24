@@ -36,16 +36,17 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
+    justify-content: center;
 }
 
-
 .developer-img {
-    width: auto;
-    height: 25vh;
-    object-fit: contain;
+    width: 100%;  /* Ensures the image takes up the full width of its container */
+    max-height: 250px;  /* Ensures a consistent max height for the images */
+    object-fit: cover;  /* Ensures the image maintains its aspect ratio while filling the space */
     border-radius: 10px;
     border: 3px solid #1d3557;
 }
+
 
 
 .developer-name {
