@@ -21,9 +21,8 @@ function Navbar(){
 
                     <div className="nav-icons">
                         <Link to={"/Profile"}><i className="fa-solid fa-circle-user"></i></Link>
-                        <Link to={"/"}><i class="fa-solid fa-cart-shopping"></i></Link>
-                        <Link to={"/"}><i class="fa-solid fa-bell"></i></Link>
-                        <Link to={"/"}><i className="fa-solid fa-gear"></i></Link>
+                        <Link to={"/AddToCart"}><i class="fa-solid fa-cart-shopping"></i></Link>
+                       
                     </div>
                 </nav>
             </header>
