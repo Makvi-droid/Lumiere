@@ -6,6 +6,7 @@ import Products from './products-page/Products';
 import Profile from './profile-page/Profile';
 import AddToCart from './add-to-cart/AddToCart';
 import { CartProvider } from './profile-page/cartContext';
+import AdminPage from './admin-page/AdminPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -19,6 +20,7 @@ function App() {
           <Route path='/Products' element={<Products />} />
           <Route path='/Profile' element={<Profile />} />
           <Route path='/AddToCart' element={<AddToCart/>}/>
+          <Route path='/AdminPage' element={<AdminPage/>}/>
         </Routes>
       </CartProvider>
     </>

@@ -41,7 +41,7 @@ function SignUp({ setCurrentUser }) {
       setErrorMessage('');
       
       // Redirect based on role
-      navigate(user.role === 'admin' ? "/Admin" : "/User");
+      navigate(user.role === 'admin' ? "/AdminPage" : "/User");
     } else {
       setErrorMessage('Invalid username or password');
     }
