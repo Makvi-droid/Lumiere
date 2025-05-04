@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import Orders from './components/Orders';
 import Customers from './components/Customers';
 import Products from './components/Products';
+import UserManagement from './components/UserManagement';
 import { OrderProvider } from '../add-to-cart/OrderContext';
 
 // Error Boundary Component
@@ -123,6 +124,12 @@ const AdminPage = () => {
         return (
           <ErrorBoundary>
             <Products />
+          </ErrorBoundary>
+        );
+        case 'user-management':
+        return (
+          <ErrorBoundary>
+            <UserManagement />
           </ErrorBoundary>
         );
       default:

@@ -1,18 +1,30 @@
 import React from 'react';
+import {
+  LayoutDashboard,
+  Box,
+  ShoppingCart,
+  Users,
+  UserCog,
+  BarChart2,
+  UserPlus,
+  ClipboardList,
+  Settings,
+  LogOut
+} from 'lucide-react';
 
 const Sidebar = ({ activeSection, onNavigate, isSidebarOpen, setIsSidebarOpen }) => {
   // Navigation items with emoji icons
   const navItems = [
-    { id: 'dashboard', name: 'Dashboard', icon: '📊' },
-    { id: 'products', name: 'Products', icon: '📦' },
-    { id: 'orders', name: 'Orders', icon: '🛒' },
-    { id: 'customers', name: 'Customers', icon: '👥' },
-    { id: 'user-management', name: 'User Management', icon: '👤' },
-    { id: 'reports', name: 'Reports', icon: '📈' },
-    { id: 'manager-registration', name: 'Manager Registration', icon: '➕' },
-    { id: 'inventory-manager', name: 'Inventory Manager', icon: '📋' },
-    { id: 'settings', name: 'Settings', icon: '⚙️' },
-    { id: 'logout', name: 'Logout', icon: '🚪' }
+    { id: 'dashboard', name: 'Dashboard', icon: <LayoutDashboard /> },
+    { id: 'products', name: 'Products', icon: <Box /> },
+    { id: 'orders', name: 'Orders', icon: <ShoppingCart /> },
+    { id: 'customers', name: 'Customers', icon: <Users /> },
+    { id: 'user-management', name: 'User Management', icon: <UserCog /> },
+    { id: 'reports', name: 'Reports', icon: <BarChart2 /> },
+    { id: 'manager-registration', name: 'Manager Registration', icon: <UserPlus /> },
+    { id: 'inventory-manager', name: 'Inventory Manager', icon: <ClipboardList /> },
+    { id: 'settings', name: 'Settings', icon: <Settings /> },
+    { id: 'logout', name: 'Logout', icon: <LogOut /> }
   ];
 
   // Function to handle navigation item click

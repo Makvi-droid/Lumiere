@@ -22,7 +22,7 @@ function Orders() {
     // Use currentUser data if available, otherwise use default values
     const [userData, setUserData] = useState({
         name: currentUser?.username || "Guest",
-        phone: currentUser?.phone || "+639876543210",
+        phone: currentUser?.contactNum || "+639876543210",
         address: currentUser?.address || "Quezon City",
     });
 

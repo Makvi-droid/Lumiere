@@ -4,6 +4,7 @@ import Contents from "./contents.jsx";
 import Rings from "./rings.jsx";
 import Necklaces from "./necklaces.jsx";
 import Bracelets from "./Bracelets.jsx";
+import Footer from "../user-landing-page/footer.jsx"
 
 function Products(){
     return(
@@ -13,6 +14,7 @@ function Products(){
             <Rings/>
             <Necklaces/>
             <Bracelets/>
+            <Footer/>
             <Outlet/>
         </>
     );

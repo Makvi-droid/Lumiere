@@ -16,12 +16,12 @@ function SignUp({ setCurrentUser }) {
 
   // Predefined list of users (5 customers + 1 admin)
   const users = [
-    { id: 1, username: "Sgt KatCat", password: "password123", role: "customer" },
-    { id: 2, username: "Biscoff", password: "password123", role: "customer" },
-    { id: 3, username: "McJobilat", password: "password123", role: "customer" },
-    { id: 4, username: "Gandalf", password: "password123", role: "customer" },
-    { id: 5, username: "emma_wilson", password: "password123", role: "customer" },
-    { id: 6, username: "admin", password: "adminpass", role: "admin" }
+    { id: 1, username: "Sgt KatCat", password: "password123", role: "customer", contactNum: "09471057194", gender: "M", email: "katcat@example.com"},
+    { id: 2, username: "Biscoff", password: "password123", role: "customer", contactNum: "09671710194", gender: "F", email: "biscoff@example.com" },
+    { id: 3, username: "McJobilat", password: "password123", role: "customer", contactNum: "09978057196", gender: "M", email: "mcjobilat@example.com" },
+    { id: 4, username: "Gandalf", password: "password123", role: "customer", contactNum: "09841017194", gender: "F", email: "gandalf@example.com" },
+    { id: 5, username: "Ryan Reynolds", password: "password123", role: "customer", contactNum: "09334718564", gender: "M", email: "reynolds@example.com" },
+    { id: 6, username: "admin", password: "adminpass", role: "admin", contactNum: "09471057194", gender: "M" }
   ];
 
   // Handle login logic
@@ -64,8 +64,8 @@ function SignUp({ setCurrentUser }) {
     }
 
     // Add the new user to the users array (mock)
-    const newUser = { id: users.length + 1, username, password, role: "customer" };
-    users.push(newUser); // You should eventually add logic to persist the users array
+    const newUser = { id: users.length + 1, username, password, role: "customer", contactNum };
+    users.push(newUser); 
     
     localStorage.setItem('currentUser', JSON.stringify(newUser));
     

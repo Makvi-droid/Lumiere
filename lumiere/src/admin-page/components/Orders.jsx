@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useOrder } from '../../add-to-cart/OrderContext';
 
+
+
 const Orders = () => {
   const { orders, removeOrder, updateOrderStatus } = useOrder();
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -8,6 +10,7 @@ const Orders = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [editingOrderId, setEditingOrderId] = useState(null);
   const [newStatus, setNewStatus] = useState('');
+  const [viewingOrder, setViewingOrder] = useState(null);
 
   useEffect(() => {
     if (orders) {
@@ -84,6 +87,26 @@ const Orders = () => {
     setNewStatus('');
   };
 
+  const calculateStatusDistribution = () => {
+    if (!orders || orders.length === 0) return [];
+
+    const statusCounts = {};
+    orders.forEach(order => {
+      const status = order.status || 'Completed';
+      statusCounts[status] = (statusCounts[status] || 0) + 1;
+    });
+
+    return Object.keys(statusCounts).map(status => ({
+      label: status,
+      color: getStatusBadgeClass(status).split(' ')[0],
+      percent: (statusCounts[status] / orders.length) * 100
+    }));
+  };
+
+  const handleViewOrder = (order) => {
+    setViewingOrder(order);
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
@@ -127,11 +150,7 @@ const Orders = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
+              
             </div>
           </div>
 
@@ -175,27 +194,25 @@ const Orders = () => {
                         <div className="text-sm text-gray-900">{order.totalItems || order.items?.length || 0} items</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">₱{order.totalAmount}</div>
+                        <div className="text-sm font-medium text-gray-900">₱{order.totalAmount?.toFixed(2) || '0.00'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex justify-start gap-4"> {/* Add flex container with gap */}
+                        <div className="flex justify-start gap-4">
+                          <button
+                            onClick={() => handleViewOrder(order)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            View
+                          </button>
                           <button
                             onClick={() => handleEdit(order.id)}
                             className="text-blue-600 hover:text-blue-800"
-                            disabled={editingOrderId === order.id}
                           >
                             Edit Status
                           </button>
-                          <button
-                            onClick={() => removeOrder(order.id)}
-                            className="text-red-600 hover:text-red-800"
-                            disabled={editingOrderId === order.id}
-                          >
-                            Remove
-                          </button>
+                         
                         </div>
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
@@ -205,7 +222,131 @@ const Orders = () => {
             <div className="px-6 py-4 text-gray-500">No orders found.</div>
           )}
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <h6 className="text-lg font-semibold text-blue-600 mb-6">Order Status Distribution</h6>
+            {calculateStatusDistribution().map(({ label, color, percent }) => (
+              <div key={label} className="mb-5">
+                <div className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded-full ${color} mr-2`}></div>
+                    <span className="text-sm font-medium text-gray-700">{label}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{percent.toFixed(1)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className={`${color} h-2.5 rounded-full`} style={{ width: `${percent}%` }}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h6 className="text-lg font-semibold text-blue-600">Recent Order Notes</h6>
+              <div className="text-sm text-gray-500">
+                Showing all {orders?.length || 0} orders
+              </div>
+            </div>
+
+            {orders && orders.length > 0 ? (
+              <div className="overflow-y-auto max-h-96 pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {orders.map((order) => (
+                  <div key={order.id} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0 last:pb-0">
+                    <div className="flex justify-between text-sm">
+                      <div className="font-medium text-gray-800">Order #{order.id}</div>
+                      <span className="text-gray-500">{formatDate(order.date)}</span>
+                    </div>
+                    <div className="flex items-center mt-2">
+                      <span className={`px-2 py-1 mr-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(order.status || 'Completed')}`}>
+                        {order.status || 'Completed'}
+                      </span>
+                      <p className="text-sm text-gray-700">
+                        {order.user?.fullName || 'Customer'} placed an order for {order.totalItems || order.items?.length || 0} items. 
+                        Total: ₱{order.totalAmount?.toFixed(2) || '0.00'}
+                      </p>
+                    </div>
+                    <div className="flex mt-3 space-x-2">
+                      {order.items && order.items.slice(0, 3).map((item, index) => (
+                        <div key={index} className="relative h-12 w-12 rounded-md overflow-hidden bg-gray-200">
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-gray-500 text-xs">
+                              No Image
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {order.items && order.items.length > 3 && (
+                        <div className="relative h-12 w-12 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center">
+                          <span className="text-xs font-medium text-gray-500">+{order.items.length - 3}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No recent orders to display</p>
+              </div>
+            )}
+
+            {orders && orders.length > 5 && (
+              <div className="mt-4 pt-3 border-t border-gray-200 flex justify-center">
+                <button className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center">
+                  <span>View All Orders</span>
+                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7m0-7H3" />
+                  </svg>
+                </button>
+                
+              </div>
+              
+            )}
+          </div>
+          
+        </div>
       </div>
+
+      {viewingOrder && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-4 rounded-lg shadow-lg max-w-md w-full overflow-auto" style={{ maxHeight: '80vh' }}>
+              <h3 className="text-xl font-semibold mb-4">Order Details - #{viewingOrder.id}</h3>
+              <div className="mb-4">
+                <strong>Customer:</strong> {viewingOrder.user?.fullName || 'N/A'}
+              </div>
+              <div className="mb-4">
+                <strong>Date:</strong> {formatDate(viewingOrder.date)}
+              </div>
+             
+              <div className="mb-4">
+                <strong>Status:</strong> <span className={getStatusBadgeClass(viewingOrder.status || 'Completed')}>{viewingOrder.status || 'Completed'}</span>
+              </div>
+              <div className="mb-4">
+                <strong>Total:</strong> ₱{viewingOrder.totalAmount?.toFixed(2) || '0.00'}
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Items:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto">
+                {viewingOrder.items && viewingOrder.items.map((item, index) => (
+                  <div key={index} className="border p-2 rounded">
+                    <h5 className="font-medium">{item.name}</h5>
+                    <img src={item.image} alt={item.name} className="h-24 w-full object-cover mb-2" />
+                    <p>Quantity: {item.quantity}</p>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => setViewingOrder(null)}
+                className="mt-4 bg-gray-300 text-gray-700 p-2 rounded-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
 
       {editingOrderId && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -240,6 +381,7 @@ const Orders = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
