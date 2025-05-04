@@ -1,10 +1,10 @@
 import { useCart } from '../profile-page/cartContext';
 import React, { useState, useEffect } from 'react';
+import { useOrder } from './OrderContext';
 
-
-function Orders(){
+function Orders() {
     const { cartItems, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
-    
+    const { addOrder } = useOrder();
     
     // Get current user from localStorage
     const getCurrentUser = () => {
@@ -22,8 +22,8 @@ function Orders(){
     // Use currentUser data if available, otherwise use default values
     const [userData, setUserData] = useState({
         name: currentUser?.username || "Guest",
-        phone: "+639876543210",
-        address: "Quezon, City",
+        phone: currentUser?.phone || "+639876543210",
+        address: currentUser?.address || "Quezon City",
     });
 
     // Checkout form state
@@ -46,7 +46,6 @@ function Orders(){
         "Caloocan",
         "Marikina"
     ];
-
    
     // Update userData when currentUser changes
     useEffect(() => {
@@ -64,10 +63,6 @@ function Orders(){
             }));
         }
     }, []);
-    
-    
-
-   
 
     const handleCheckoutChange = (e) => {
         const { id, value } = e.target;
@@ -77,10 +72,8 @@ function Orders(){
         }));
     };
 
-    
-    
-
     const handleQuantityChange = (id, newQuantity) => {
+        if (newQuantity < 1) newQuantity = 1;
         updateQuantity(id, parseInt(newQuantity));
     };
 
@@ -95,32 +88,47 @@ function Orders(){
             return;
         }
         
-        // Instead of immediately checking out, show the checkout modal
+        // Show the checkout modal
         const checkoutModal = new window.bootstrap.Modal(document.getElementById('checkoutModal'));
         checkoutModal.show();
     };
 
     const processCheckout = () => {
-        // Validate checkout form
         if (!checkoutData.fullName || !checkoutData.contactNumber || !checkoutData.location) {
             displayToast("Please fill all checkout fields", "error");
             return;
         }
-
-        // Close modal
+    
+        const newOrder = {
+            items: cartItems.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image, // Store the image URL
+                totalPrice: item.price * item.quantity
+            })),
+            totalAmount: getTotalPrice(),
+            totalItems: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+            user: {
+                fullName: checkoutData.fullName,
+                contactNumber: checkoutData.contactNumber,
+                location: checkoutData.location,
+            },
+            date: new Date().toISOString(),
+        };
+    
+        // Add the order and get the order ID
+        const orderId = addOrder(newOrder);
+    
+        // Close the modal
         const checkoutModalElement = document.getElementById('checkoutModal');
         const checkoutModal = window.bootstrap.Modal.getInstance(checkoutModalElement);
         checkoutModal.hide();
-        
-        // Process the order with the checkout information
-        console.log("Processing order with info:", checkoutData);
-        
-        // Clear cart and show success message
-        displayToast("Order placed successfully!");
+    
+        displayToast(`Order #${orderId} placed successfully!`);
         clearCart();
     };
-
-    
 
     const displayToast = (message, type = 'success') => {
         const toast = document.getElementById('notificationToast');
@@ -219,105 +227,101 @@ function Orders(){
                 </div>
             </div>
 
-             {/* Shopping Cart */}
-    <div className="p-3">
-        <h5 className="mb-3">Your Shopping Cart</h5>
+            {/* Shopping Cart */}
+            <div className="p-3">
+                <h5 className="mb-3">Your Shopping Cart</h5>
 
-        {cartItems.length === 0 ? (
-            <div className="alert alert-info mb-0">
-                <div className="text-center py-4">
-                    <i className="bi bi-cart3 fs-1"></i>
-                    <h5 className="mt-3">Your shopping cart is empty</h5>
-                    <p className="text-muted">Browse our collection and add some beautiful items!</p>
-                </div>
-            </div>
-        ) : (
-            <div className="container px-0">
-                {cartItems.map(item => (
-                    <div key={item.id} className="mb-3 border rounded shadow-sm p-3">
-                        <div className="row align-items-center">
-                            <div className="col-md-2 col-3">
-                                <img 
-                                    src={item.image} 
-                                    alt={item.name} 
-                                    className="img-fluid rounded"
-                                    style={{ aspectRatio: '1/1', objectFit: 'cover' }}
-                                />
-                            </div>
-                            <div className="col-md-4 col-9">
-                                <h5 className="cart-item-title">{item.name}</h5>
-                                <p className="cart-item-price mb-0 fw-bold">₱{item.price}</p>
-                            </div>
-                            <div className="col-md-3 col-6 mt-md-0 mt-3">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <button 
-                                    className="btn btn-outline-secondary px-2" 
-                                    type="button"
-                                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                    disabled={item.quantity <= 1}
-                                >−</button>
+                {cartItems.length === 0 ? (
+                    <div className="alert alert-info mb-0">
+                        <div className="text-center py-4">
+                            <i className="bi bi-cart3 fs-1"></i>
+                            <h5 className="mt-3">Your shopping cart is empty</h5>
+                            <p className="text-muted">Browse our collection and add some beautiful items!</p>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="container px-0">
+                        {cartItems.map(item => (
+                            <div key={item.id} className="mb-3 border rounded shadow-sm p-3">
+                                <div className="row align-items-center">
+                                    <div className="col-md-2 col-3">
+                                        <img 
+                                            src={item.image} 
+                                            alt={item.name} 
+                                            className="img-fluid rounded"
+                                            style={{ aspectRatio: '1/1', objectFit: 'cover' }}
+                                        />
+                                    </div>
+                                    <div className="col-md-4 col-9">
+                                        <h5 className="cart-item-title">{item.name}</h5>
+                                        <p className="cart-item-price mb-0 fw-bold">₱{item.price}</p>
+                                    </div>
+                                    <div className="col-md-3 col-6 mt-md-0 mt-3">
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <button 
+                                                className="btn btn-outline-secondary px-2" 
+                                                type="button"
+                                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                                disabled={item.quantity <= 1}
+                                            >−</button>
 
-                                <input 
-                                    type="number" 
-                                    className="form-control mx-2 text-center"
-                                    style={{ maxWidth: "60px" }}
-                                    value={item.quantity} 
-                                    onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
-                                    min="1"
-                                />
+                                            <input 
+                                                type="number" 
+                                                className="form-control mx-2 text-center"
+                                                style={{ maxWidth: "60px" }}
+                                                value={item.quantity} 
+                                                onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
+                                                min="1"
+                                            />
 
-                                <button 
-                                    className="btn btn-outline-secondary px-2" 
-                                    type="button"
-                                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                >+</button>
-                            </div>
-                            </div>
+                                            <button 
+                                                className="btn btn-outline-secondary px-2" 
+                                                type="button"
+                                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                            >+</button>
+                                        </div>
+                                    </div>
 
-                            <div className="col-md-2 col-6 text-md-center mt-md-0 mt-3">
-                                <p className="item-total mb-0 fw-bold">₱{(item.price * item.quantity).toFixed(2)}</p>
-                            </div>
-                                <div className="col-md-1 col-12 text-md-end text-end mt-md-0 mt-3">
-                                    <button 
-                                        className="delete-btn btn btn-sm btn-outline-danger"
-                                        onClick={() => handleRemoveItem(item.id)}
-                                    >
-                                        <i className="fa-solid fa-trash"></i>
-                                    </button>
+                                    <div className="col-md-2 col-6 text-md-center mt-md-0 mt-3">
+                                        <p className="item-total mb-0 fw-bold">₱{(item.price * item.quantity).toFixed(2)}</p>
+                                    </div>
+                                    <div className="col-md-1 col-12 text-md-end mt-md-0 mt-3">
+                                        <button 
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() => handleRemoveItem(item.id)}
+                                        >
+                                            <i className="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    <div className="cart-summary p-3 bg-light rounded mt-4">
-                        <div className="row align-items-center">
-                            <div className="col-md-6">
-                                <h5 className="mb-0">
-                                    Total Items: <span className="badge bg-primary">
-                                        {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-                                    </span>
-                                </h5>
-                            </div>
-                            <div className="col-md-6 text-md-end mt-md-0 mt-3">
-                                <h5 className="mb-3">
-                                    Total: <span className="fw-bold">
-                                        ₱{getTotalPrice().toFixed(2)}
-                                    </span>
-                                </h5>
-                                <div className="btn-group">
-                                    <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
-                                    <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
+                        <div className="cart-summary p-3 bg-light rounded mt-4">
+                            <div className="row align-items-center">
+                                <div className="col-md-6">
+                                    <h5 className="mb-0">
+                                        Total Items: <span className="badge bg-primary">
+                                            {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+                                        </span>
+                                    </h5>
+                                </div>
+                                <div className="col-md-6 text-md-end mt-md-0 mt-3">
+                                    <h5 className="mb-3">
+                                        Total: <span className="fw-bold">
+                                            ₱{getTotalPrice().toFixed(2)}
+                                        </span>
+                                    </h5>
+                                    <div className="btn-group">
+                                        <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
+                                        <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
-   
-        
-    
-    
+                )}
+            </div>
         </>
     );
 }

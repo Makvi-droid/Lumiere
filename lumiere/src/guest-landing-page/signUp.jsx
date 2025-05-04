@@ -16,10 +16,10 @@ function SignUp({ setCurrentUser }) {
 
   // Predefined list of users (5 customers + 1 admin)
   const users = [
-    { id: 1, username: "McJobilat", password: "password123", role: "customer" },
-    { id: 2, username: "jane_smith", password: "password123", role: "customer" },
-    { id: 3, username: "alice_jones", password: "password123", role: "customer" },
-    { id: 4, username: "bob_brown", password: "password123", role: "customer" },
+    { id: 1, username: "Sgt KatCat", password: "password123", role: "customer" },
+    { id: 2, username: "Biscoff", password: "password123", role: "customer" },
+    { id: 3, username: "McJobilat", password: "password123", role: "customer" },
+    { id: 4, username: "Gandalf", password: "password123", role: "customer" },
     { id: 5, username: "emma_wilson", password: "password123", role: "customer" },
     { id: 6, username: "admin", password: "adminpass", role: "admin" }
   ];

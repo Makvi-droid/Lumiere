@@ -7,23 +7,26 @@ import Profile from './profile-page/Profile';
 import AddToCart from './add-to-cart/AddToCart';
 import { CartProvider } from './profile-page/cartContext';
 import AdminPage from './admin-page/AdminPage';
+import { OrderProvider } from './add-to-cart/OrderContext';
+import Dashboard from './admin-page/components/Dashboard';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   return (
-    <>
+    <OrderProvider>
       <CartProvider>
         <Routes>
           <Route path='/' element={<Guest setCurrentUser={setCurrentUser} />} />
           <Route path='/User' element={<User currentUser={currentUser} />} />
           <Route path='/Products' element={<Products />} />
           <Route path='/Profile' element={<Profile />} />
-          <Route path='/AddToCart' element={<AddToCart/>}/>
-          <Route path='/AdminPage' element={<AdminPage/>}/>
+          <Route path='/AddToCart' element={<AddToCart />} />
+          <Route path='/AdminPage' element={<AdminPage />} />
+          <Route path='/Dashboard' element={<Dashboard/>}/>
         </Routes>
       </CartProvider>
-    </>
+    </OrderProvider>
   );
 }
 

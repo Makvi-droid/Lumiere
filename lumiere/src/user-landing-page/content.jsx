@@ -17,7 +17,7 @@ function Content(){
                         high-quality jewelry at prices that let you <br/>shine without breaking the bank. <br/>From elegant everyday 
                         pieces to <br/>stunning statement designs, we make <br/>affordable luxury a reality—because everyone deserves to sparkle.</p>
 
-                        <button className='shop-btn'>Shop Now</button>
+                        
                     </div>
 
                     <div className='left-content'>

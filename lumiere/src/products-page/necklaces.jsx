@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useCart } from '../profile-page/cartContext';
 import './product-cards.css';
-import ring1 from '../guest-landing-page/assets/ring1.jpg'
+import { assets } from './assets/assets';
 
 
 function Necklaces() {
@@ -89,19 +89,19 @@ function Necklaces() {
                    <div className="col-6 col-md-4 col-lg-3">
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
-                         <img src={ring1} 
-                           className="card-img-top product-image" alt="Celestial Halo Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                         <img src={assets.necklace1} 
+                           className="card-img-top product-image" alt="Aurora Strand" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Celestial Halo</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱1900.00</p>
+                         <h5 className="card-title fw-bold mb-2">Aurora Strand</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱679.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold" 
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="1" 
-                           data-name="Celestial Halo" 
-                           data-price="1900.00" 
-                           data-image={ring1}>
+                           data-name="Aurora Strand" 
+                           data-price="679.00" 
+                           data-image={assets.necklace1}>
                            Add To Cart
                          </button>
                        </div>
@@ -113,20 +113,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640" 
+                           src={assets.necklace2} 
                            className="card-img-top product-image" 
-                           alt="Moonstone Mirage Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Celestial Drape" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Moonstone Mirage</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱5000.00</p>
+                         <h5 className="card-title fw-bold mb-2">Celestial Drape</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱229.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="2" 
-                           data-name="Moonstone Mirage" 
-                           data-price="5000.00"
-                           data-image="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640">
+                           data-name="Celestial Drape" 
+                           data-price="229.00"
+                           data-image={assets.necklace2}>
                            Add To Cart
                          </button>
                        </div>
@@ -138,20 +138,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg" 
+                           src={assets.necklace3} 
                            className="card-img-top product-image" 
-                           alt="Eternal Bloom Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Luna Cascade" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Eternal Bloom</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱2500.00</p>
+                         <h5 className="card-title fw-bold mb-2">Luna Cascade</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱449.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="3" 
-                           data-name="Eternal Bloom" 
-                           data-price="2500.00"
-                           data-image="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg">
+                           data-name="Luna Cascade" 
+                           data-price="449.00"
+                           data-image={assets.necklace3}>
                            Add To Cart
                          </button>
                        </div>
@@ -163,20 +163,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg" 
+                           src={assets.necklace4} 
                            className="card-img-top product-image" 
-                           alt="Aurora Twist Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Ivory Thread" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Aurora Twist</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱3000.00</p>
+                         <h5 className="card-title fw-bold mb-2">Ivory Thread</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱319.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="4" 
-                           data-name="Aurora Twist" 
-                           data-price="3000.00"
-                           data-image="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg">
+                           data-name="Ivory Thread" 
+                           data-price="319.00"
+                           data-image={assets.necklace4}>
                            Add To Cart
                          </button>
                        </div>
@@ -188,20 +188,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://www.prouds.com.au/content/products/9ct-gold-diamond-heart-ring-8641228-188554.jpg" 
+                           src={assets.necklace5} 
                            className="card-img-top product-image" 
-                           alt="Crystal Embrace Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Pearl Étoile" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Crystal Embrace</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱4500.00</p>
+                         <h5 className="card-title fw-bold mb-2">Pearl Étoile</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱639.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="5" 
-                           data-name="Crystal Embrace" 
-                           data-price="4500.00"
-                           data-image="https://www.prouds.com.au/content/products/9ct-gold-diamond-heart-ring-8641228-188554.jpg">
+                           data-name="Pearl Étoile" 
+                           data-price="639.00"
+                           data-image={assets.necklace5}>
                            Add To Cart
                          </button>
                        </div>
@@ -213,20 +213,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640" 
+                           src={assets.necklace6} 
                            className="card-img-top product-image" 
-                           alt="Moonstone Mirage Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Sapphire Lace" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Moonstone Mirage</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱5000.00</p>
+                         <h5 className="card-title fw-bold mb-2">Sapphire Lace</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱639.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="6" 
-                           data-name="Moonstone Mirage" 
-                           data-price="5000.00"
-                           data-image="https://www.tanishq.co.in/dw/image/v2/BKCK_PRD/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dwcfbf242b/images/hi-res/503414FCZAB02_1.jpg?sw=640&sh=640">
+                           data-name="Sapphire Lace" 
+                           data-price="639.00"
+                           data-image={assets.necklace6}>
                            Add To Cart
                          </button>
                        </div>
@@ -238,20 +238,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg" 
+                           src={assets.necklace7} 
                            className="card-img-top product-image" 
-                           alt="Eternal Bloom Ring" 
-                           style={{ height: "260px", objectFit: "contain" }}/>
+                           alt="Elysian Charm" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Eternal Bloom</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱2500.00</p>
+                         <h5 className="card-title fw-bold mb-2">Elysian Charm</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱639.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="7" 
-                           data-name="Eternal Bloom" 
-                           data-price="2500.00"
-                           data-image="https://www.tanishq.co.in/on/demandware.static/-/Sites-Tanishq-product-catalog/default/dw8093faa5/images/hi-res/50D5PTFUJAA10_1.jpg">
+                           data-name="Elysian Charm" 
+                           data-price="639.00"
+                           data-image={assets.necklace7}>
                            Add To Cart
                          </button>
                        </div>
@@ -263,20 +263,20 @@ function Necklaces() {
                      <div className="card h-100 shadow product-card border-0">
                        <div className="product-image-container">
                          <img 
-                           src="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg" 
+                           src={assets.necklace8} 
                            className="card-img-top product-image" 
-                           alt="Aurora Twist Ring" 
-                           style={{ height: "260px", objectFit: "cover" }}/>
+                           alt="Heirloom Radiance" 
+                           style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
                        </div>
                        <div className="card-body p-3 d-flex flex-column">
-                         <h5 className="card-title fw-bold mb-2">Aurora Twist</h5>
-                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱3000.00</p>
+                         <h5 className="card-title fw-bold mb-2">Heirloom Radiance</h5>
+                         <p className="card-text fw-bold text-primary fs-5 mb-3">₱639.00</p>
                          <button className="btn btn-primary mt-auto py-2 fw-bold"
                            onClick={(e) => handleAddToCartClick(e.currentTarget)}
                            data-id="8" 
-                           data-name="Aurora Twist" 
-                           data-price="3000.00"
-                           data-image="https://dynamic.zacdn.com/qBFi3gYNEEvSt01CIek238KO5G4=/filters:quality(70):format(webp)/https://static-hk.zacdn.com/p/elli-jewelry-9906-2286616-1.jpg">
+                           data-name="Heirloom Radiance" 
+                           data-price="639.00"
+                           data-image={assets.necklace8}>
                            Add To Cart
                          </button>
                        </div>
