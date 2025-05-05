@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { products as initialProducts } from '../../products-page/assets/assets';
+import React, { useState } from 'react';
+import { useProducts } from '../../products-page/ProductContext';
 
 const Products = () => {
-  const [productsData, setProductsData] = useState(() => {
-    // Try to get products from local storage or use initialProducts as fallback
-    const savedProducts = localStorage.getItem('productsData');
-    return savedProducts ? JSON.parse(savedProducts) : initialProducts;
-  });
+  const { 
+    productsData, 
+    handleStockChange, 
+    updateProductStock, 
+    deleteProduct, 
+    editProduct 
+  } = useProducts();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [viewProduct, setViewProduct] = useState(null);
-  const [editProduct, setEditProduct] = useState(null);
-
-  // Save the productsData to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('productsData', JSON.stringify(productsData));
-  }, [productsData]);
 
   // Get status styles for the status badge
   const getStatusStyles = (status) => {
@@ -35,39 +32,6 @@ const Products = () => {
     'In Stock': productsData.filter(p => p.status === 'In Stock').length,
     'Low Stock': productsData.filter(p => p.status === 'Low Stock').length,
     'Out of Stock': productsData.filter(p => p.status === 'Out of Stock').length,
-  };
-
-  // Handle deleting a product
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      setProductsData(prev => prev.filter(p => p.id !== id));
-    }
-  };
-
-  // Handle editing a product
-  const handleEdit = (product) => {
-    const updatedName = prompt("Edit product name:", product.name);
-    if (updatedName !== null && updatedName.trim() !== '') {
-      setProductsData(prev =>
-        prev.map(p => (p.id === product.id ? { ...p, name: updatedName } : p))
-      );
-    }
-  };
-
-  // Handle updating stock for a product
-  const handleStockUpdate = (id, newStock) => {
-    setProductsData(prev =>
-      prev.map(p => 
-        p.id === id ? { ...p, stock: newStock, status: newStock > 10 ? 'In Stock' : newStock > 0 ? 'Low Stock' : 'Out of Stock' } : p
-      )
-    );
-  };
-
-  // Increase or decrease stock
-  const handleStockChange = (id, change) => {
-    const product = productsData.find(p => p.id === id);
-    const newStock = product.stock + change;
-    handleStockUpdate(id, Math.max(newStock, 0)); // Ensure stock doesn't go below 0
   };
 
   return (
@@ -92,9 +56,6 @@ const Products = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-gray-800">Product Management</h2>
         <div className="relative w-64">
-         
-           
-         
           <input
             type="text"
             placeholder="Search products..."
@@ -102,7 +63,6 @@ const Products = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          
         </div>
       </div>
 
@@ -150,7 +110,7 @@ const Products = () => {
                         <input
                           type="number"
                           value={product.stock}
-                          onChange={(e) => handleStockUpdate(product.id, parseInt(e.target.value))}
+                          onChange={(e) => updateProductStock(product.id, parseInt(e.target.value))}
                           className="w-20 p-1 border border-gray-300 rounded mx-2"
                         />
                         <button
@@ -166,7 +126,7 @@ const Products = () => {
                         {product.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center text-sm space-x-4 justify-between gap-6 p-7"> {/* Reduced space-x-7 and gap-7 to space-x-4 and gap-4 */}
+                    <td className="px-6 py-4 text-center text-sm space-x-4 justify-between gap-4 p-4">
                         <button
                           className="text-blue-600 hover:text-blue-900"
                           title="View"
@@ -177,20 +137,18 @@ const Products = () => {
                         <button
                           className="text-green-600 hover:text-green-900"
                           title="Edit"
-                          onClick={() => handleEdit(product)}
+                          onClick={() => editProduct(product)}
                         >
                           <i className="fas fa-edit text-2xl mr-2"></i>
                         </button>
                         <button
                           className="text-red-600 hover:text-red-900"
                           title="Delete"
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => deleteProduct(product.id)}
                         >
                           <i className="fas fa-trash-alt text-2xl"></i>
                         </button>
                       </td>
-
-
                   </tr>
               ))}
             </tbody>
@@ -206,7 +164,7 @@ const Products = () => {
             <img src={viewProduct.image} alt={viewProduct.name} className="w-20 h-20 object-cover rounded mb-2" />
             <p><strong>Name:</strong> {viewProduct.name}</p>
             <p><strong>Category:</strong> {viewProduct.category}</p>
-            <p><strong>Price:</strong> ${viewProduct.price.toFixed(2)}</p>
+            <p><strong>Price:</strong> ₱{viewProduct.price.toFixed(2)}</p>
             <p><strong>Stock:</strong> {viewProduct.stock}</p>
             <p><strong>Status:</strong> {viewProduct.status}</p>
             <button

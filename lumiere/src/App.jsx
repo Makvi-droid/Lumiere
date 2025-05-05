@@ -9,11 +9,13 @@ import { CartProvider } from './profile-page/cartContext';
 import AdminPage from './admin-page/AdminPage';
 import { OrderProvider } from './add-to-cart/OrderContext';
 import Dashboard from './admin-page/components/Dashboard';
+import { ProductProvider } from './products-page/ProductContext';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   return (
+    <ProductProvider>
     <OrderProvider>
       <CartProvider>
         <Routes>
@@ -27,6 +29,7 @@ function App() {
         </Routes>
       </CartProvider>
     </OrderProvider>
+    </ProductProvider>
   );
 }
 

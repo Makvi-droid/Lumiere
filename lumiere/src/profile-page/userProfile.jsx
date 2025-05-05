@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Profile from './assets/profile.jpg';
 import { motion } from 'framer-motion';
-import Dashboard from '../admin-page/components/Dashboard';
+import { useOrder } from '../add-to-cart/OrderContext'; 
+import DashBoard from '../admin-page/components/Dashboard'
 
 function UserProfile() {
     const navigate = useNavigate();
+    const { orders: allOrders } = useOrder(); // Get orders from context
 
-    // Only called once to initialize
     const getCurrentUser = () => {
         try {
             const userJson = localStorage.getItem('currentUser');
@@ -18,11 +19,7 @@ function UserProfile() {
         }
     };
 
-    
-
-    // ✅ Avoid re-creating on every render
     const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
-
     const [userData, setUserData] = useState({
         name: currentUser?.username || "Guest",
         phone: currentUser?.contactNum || '',
@@ -59,29 +56,12 @@ function UserProfile() {
             }));
         }
 
-        const loadOrdersFromStorage = () => {
-            try {
-                const ordersData = localStorage.getItem('dashboardOrders');
-                if (ordersData) {
-                    const allOrders = JSON.parse(ordersData);
-                    const userOrders = currentUser?.id 
-                        ? allOrders.filter(order =>
-                            order.user?.id === currentUser.id || 
-                            order.userId === currentUser.id)
-                        : [];
-                        setOrders(userOrders);
-                }
-            } catch (error) {
-                console.error("Error loading orders from localStorage:", error);
-            }
-        };
-
-        loadOrdersFromStorage();
-        window.addEventListener('storage', loadOrdersFromStorage);
-        return () => {
-            window.removeEventListener('storage', loadOrdersFromStorage);
-        };
-    }, [currentUser]);
+        // Filter orders for the current user
+        const userOrders = allOrders.filter(order =>
+            order.user?.id === currentUser.id || order.userId === currentUser.id
+        );
+        setOrders(userOrders);
+    }, [currentUser, allOrders]);
 
     const handleProfileChange = (e) => {
         const { id, value } = e.target;
@@ -113,28 +93,19 @@ function UserProfile() {
         setIsModalOpen(prev => ({ ...prev, password: false }));
     };
 
-    const removeOrder = (orderId) => {
-        try {
-            const ordersData = localStorage.getItem('dashboardOrders');
-            if (ordersData) {
-                const allOrders = JSON.parse(ordersData);
-                const updatedOrders = allOrders.filter(order => order.id !== orderId);
-                localStorage.setItem('dashboardOrders', JSON.stringify(updatedOrders));
-                setOrders(updatedOrders);
-                displayToast("Order removed successfully");
-            }
-        } catch (error) {
-            console.error("Error removing order:", error);
-            displayToast("Failed to remove order", 'error');
-        }
-    };
 
     const handleLogout = () => {
+        setIsModalOpen(prevState => ({ ...prevState, logoutConfirmation: true })); // Open confirmation modal
+    };
+
+    const confirmLogout = () => {
         localStorage.removeItem('currentUser');
         displayToast("Logged out successfully");
-        setTimeout(() => {
-            navigate('/');
-        }, 1000);
+        navigate('/');
+    };
+
+    const cancelLogout = () => {
+        setIsModalOpen(prevState => ({ ...prevState, logoutConfirmation: false })); // Close confirmation modal
     };
 
     const displayToast = (message, type = 'success') => {
@@ -199,10 +170,7 @@ function UserProfile() {
         
         return (
             <div className="fixed inset-0 z-50 overflow-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                {/* Overlay - separate from content */}
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose}></div>
-                
-                {/* Modal content - position fixed instead of flex */}
                 <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl sm:max-w-lg sm:w-full">
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -468,6 +436,19 @@ function UserProfile() {
                                 </div>
                             </motion.div>
                         </div>
+
+                        {/* Logout Confirmation Modal */}
+                        {isModalOpen.logoutConfirmation && (
+                            <Modal
+                                isOpen={isModalOpen.logoutConfirmation}
+                                onClose={cancelLogout}
+                                title="Confirm Logout"
+                                onSave={confirmLogout}
+                                saveText="Logout"
+                            >
+                                <p>Are you sure you want to log out?</p>
+                            </Modal>
+                        )}
                         
                         {/* Main Content */}
                         <div className="w-full md:w-2/3 lg:w-3/4">
@@ -521,21 +502,20 @@ function UserProfile() {
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <div className="bg-gray-50 rounded-xl shadow-sm p-6">
-                                                <h5 className="text-gray-800 font-bold mb-4">Account Security</h5>
-                                                <p className="mb-4">Protect your account with a strong password.</p>
-                                                <button 
-                                                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
-                                                    onClick={() => setIsModalOpen(prevState => ({...prevState, password: true}))}
-                                                >
-                                                    Change Password
-                                                </button>
-                                            </div>
+                                        <div className="bg-gray-50 rounded-xl shadow-sm p-6">
+                                            <h5 className="text-gray-800 font-bold mb-4">Account Security</h5>
+                                            <p className="mb-4">Protect your account with a strong password.</p>
+                                            <button 
+                                                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                                                onClick={() => setIsModalOpen(prevState => ({...prevState, password: true}))}
+                                            >
+                                                Change Password
+                                            </button>
                                         </div>
                                     </div>
                                 </motion.div>
                             )}
+                             
                             
                             {/* Orders Tab */}
                             {activeTab === 'orders' && (
@@ -585,6 +565,8 @@ function UserProfile() {
                                     </div>
                                 </motion.div>
                             )}
+
+                           
                         </div>
                     </div>
                 </div>

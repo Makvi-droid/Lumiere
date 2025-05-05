@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./signUp.css";
 import register from "./assets/register.svg";
@@ -11,8 +11,19 @@ function SignUp({ setCurrentUser }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // New state variables for enhanced functionality
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutTimer, setLockoutTimer] = useState(0);
+  const [showAdminVerification, setShowAdminVerification] = useState(false);
+  const [adminVerificationCode, setAdminVerificationCode] = useState('');
+  const [inputShake, setInputShake] = useState(false);
 
   const navigate = useNavigate();
+
+  // Admin verification code 
+  const ADMIN_CODE = "A123456";
 
   // Predefined list of users (5 customers + 1 admin)
   const users = [
@@ -24,26 +35,116 @@ function SignUp({ setCurrentUser }) {
     { id: 6, username: "admin", password: "adminpass", role: "admin", contactNum: "09471057194", gender: "M" }
   ];
 
+  // Check for lockout on component load
+  useEffect(() => {
+    const lockoutInfo = JSON.parse(localStorage.getItem('loginLockout') || '{}');
+    if (lockoutInfo.locked && lockoutInfo.expiryTime > Date.now()) {
+      setIsLocked(true);
+      startLockoutTimer(Math.floor((lockoutInfo.expiryTime - Date.now()) / 1000));
+    }
+  }, []);
+
+  // Countdown timer for account lockout
+  useEffect(() => {
+    let interval;
+    if (isLocked && lockoutTimer > 0) {
+      interval = setInterval(() => {
+        setLockoutTimer(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(interval);
+            setIsLocked(false);
+            localStorage.removeItem('loginLockout');
+            setLoginAttempts(0);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => interval && clearInterval(interval);
+  }, [isLocked, lockoutTimer]);
+
+  // Function to start the lockout timer
+  const startLockoutTimer = (seconds) => {
+    setLockoutTimer(seconds);
+    const expiryTime = Date.now() + seconds * 1000;
+    localStorage.setItem('loginLockout', JSON.stringify({
+      locked: true,
+      expiryTime
+    }));
+  };
+
   // Handle login logic
   const handleLogin = (e) => {
     e.preventDefault();
+
+    // Check if account is locked
+    if (isLocked) {
+      setErrorMessage(`Account is locked. Try again in ${lockoutTimer} seconds.`);
+      triggerShakeAnimation();
+      return;
+    }
 
     const user = users.find(
       (u) => u.username === username && u.password === password
     );
 
     if (user) {
-      // Store the user in localStorage to persist across page refreshes
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      // Reset login attempts on successful login
+      setLoginAttempts(0);
       
-      // Set the logged-in user
-      setCurrentUser(user);
-      setErrorMessage('');
+      // For admin users, show verification dialog
+      if (user.role === 'admin') {
+        setShowAdminVerification(true);
+        return;
+      }
       
-      // Redirect based on role
-      navigate(user.role === 'admin' ? "/AdminPage" : "/User");
+      // For regular users, proceed with login
+      completeLogin(user);
     } else {
-      setErrorMessage('Invalid username or password');
+      // Increment failed login attempts
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      
+      // Lock account after 3 failed attempts
+      if (newAttempts >= 3) {
+        setIsLocked(true);
+        startLockoutTimer(300); // 5 minutes (300 seconds)
+        setErrorMessage(`Too many failed attempts. Account locked for 5 minutes.`);
+      } else {
+        setErrorMessage(`Invalid username or password. ${3 - newAttempts} attempts remaining.`);
+      }
+      
+      triggerShakeAnimation();
+    }
+  };
+
+  // Complete the login process
+  const completeLogin = (user) => {
+    // Store the user in localStorage to persist across page refreshes
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    
+    // Set the logged-in user
+    setCurrentUser(user);
+    setErrorMessage('');
+    
+    // Redirect based on role
+    navigate(user.role === 'admin' ? "/AdminPage" : "/User");
+  };
+
+  // Handle admin verification
+  const handleAdminVerify = (e) => {
+    e.preventDefault();
+    
+    if (adminVerificationCode === ADMIN_CODE) {
+      // Find admin user again to be safe
+      const adminUser = users.find(u => u.username === username && u.role === 'admin');
+      if (adminUser) {
+        completeLogin(adminUser);
+      }
+    } else {
+      setErrorMessage("Invalid verification code");
+      triggerShakeAnimation();
     }
   };
 
@@ -54,17 +155,33 @@ function SignUp({ setCurrentUser }) {
     // Check if fields are filled
     if (username === "" || password === "" || confirmPassword === "" || email === "") {
       setErrorMessage("All fields must be filled");
+      triggerShakeAnimation();
       return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match");
+      triggerShakeAnimation();
+      return;
+    }
+
+    // Check if username already exists
+    if (users.some(user => user.username === username)) {
+      setErrorMessage("Username already exists");
+      triggerShakeAnimation();
       return;
     }
 
     // Add the new user to the users array (mock)
-    const newUser = { id: users.length + 1, username, password, role: "customer", contactNum };
+    const newUser = { 
+      id: users.length + 1, 
+      username, 
+      password, 
+      role: "customer", 
+      email,
+      contactNum: "" // Added to match the existing user structure
+    };
     users.push(newUser); 
     
     localStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -76,6 +193,12 @@ function SignUp({ setCurrentUser }) {
     navigate("/User"); // Switch to login after successful sign-up
   };
 
+  // Trigger shake animation for invalid inputs
+  const triggerShakeAnimation = () => {
+    setInputShake(true);
+    setTimeout(() => setInputShake(false), 500);
+  };
+
   return (
     <div className={`sign-up-container ${signUpMode ? "sign-up-mode" : ""}`}>
       <div className="forms-container">
@@ -83,7 +206,7 @@ function SignUp({ setCurrentUser }) {
           {/* Sign-in Form */}
           <form onSubmit={handleLogin} className="sign-in-form">
             <h2 className="title">Sign in</h2>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-user"></i>
               <input
                 type="text"
@@ -91,9 +214,10 @@ function SignUp({ setCurrentUser }) {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLocked}
               />
             </div>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-lock"></i>
               <input
                 type="password"
@@ -101,16 +225,22 @@ function SignUp({ setCurrentUser }) {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLocked}
               />
             </div>
-            <input type="submit" value="Login" className="btn solid" />
+            <input 
+              type="submit" 
+              value={isLocked ? `Locked (${lockoutTimer}s)` : "Login"} 
+              className="btn solid" 
+              disabled={isLocked}
+            />
             {errorMessage && <div className="error-message">{errorMessage}</div>}
           </form>
 
           {/* Sign-up Form */}
           <form onSubmit={handleSignUp} className="sign-up-form">
             <h2 className="title">Sign up</h2>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-user"></i>
               <input
                 type="text"
@@ -120,7 +250,7 @@ function SignUp({ setCurrentUser }) {
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-envelope"></i>
               <input
                 type="email"
@@ -130,7 +260,7 @@ function SignUp({ setCurrentUser }) {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-lock"></i>
               <input
                 type="password"
@@ -140,7 +270,7 @@ function SignUp({ setCurrentUser }) {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <div className="input-field">
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
               <i className="fas fa-lock"></i>
               <input
                 type="password"
@@ -155,6 +285,31 @@ function SignUp({ setCurrentUser }) {
           </form>
         </div>
       </div>
+
+      {/* Admin Verification Modal */}
+      {showAdminVerification && (
+        <div className="admin-verification-overlay">
+          <div className="admin-verification-modal">
+            <h3>Admin Verification</h3>
+            <p>Please enter the admin verification code to continue</p>
+            <div className={`input-field ${inputShake && errorMessage ? "shake" : ""}`}>
+              <i className="fas fa-shield-alt"></i>
+              <input
+                type="text"
+                placeholder="Verification Code"
+                value={adminVerificationCode}
+                onChange={(e) => setAdminVerificationCode(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="admin-verification-actions">
+              <button className="btn" onClick={handleAdminVerify}>Verify</button>
+              <button className="btn cancel" onClick={() => setShowAdminVerification(false)}>Cancel</button>
+            </div>
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+          </div>
+        </div>
+      )}
 
       {/* Panels for toggling between sign-in and sign-up */}
       <div className="panels-container">

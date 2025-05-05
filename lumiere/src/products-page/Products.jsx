@@ -5,10 +5,13 @@ import Rings from "./rings.jsx";
 import Necklaces from "./necklaces.jsx";
 import Bracelets from "./Bracelets.jsx";
 import Footer from "../user-landing-page/footer.jsx"
+import { ProductProvider } from "./ProductContext.jsx";
+
 
 function Products(){
     return(
         <>
+        <ProductProvider>
             <Navbar />  
             <Contents/> 
             <Rings/>
@@ -16,6 +19,7 @@ function Products(){
             <Bracelets/>
             <Footer/>
             <Outlet/>
+            </ProductProvider>
         </>
     );
 }

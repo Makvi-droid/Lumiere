@@ -419,3 +419,115 @@
       left: 50%;
     }
   }
+
+
+  /* Add these styles to your existing signUp.css file */
+
+/* Shake animation for invalid inputs */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  border-color: #ff3860 !important;
+}
+
+.error-message {
+  color: #ff3860;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: rgba(255, 56, 96, 0.1);
+  border-radius: 5px;
+  text-align: center;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  animation: errorPulse 2s infinite;
+}
+
+@keyframes errorPulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+/* Admin Verification Modal Styles */
+.admin-verification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-verification-modal {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 90%;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.admin-verification-modal h3 {
+  color: #5995fd;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.admin-verification-modal p {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #444;
+}
+
+.admin-verification-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.admin-verification-actions .btn {
+  width: 48%;
+}
+
+.admin-verification-actions .cancel {
+  background-color: #aaa;
+}
+
+.admin-verification-actions .cancel:hover {
+  background-color: #999;
+}
+
+/* Disabled Button Styles */
+.btn:disabled {
+  background-color: #b9b9b9;
+  cursor: not-allowed;
+}
+
+/* Success Animation */
+@keyframes successPulse {
+  0% { box-shadow: 0 0 0 0 rgba(72, 199, 116, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(72, 199, 116, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(72, 199, 116, 0); }
+}

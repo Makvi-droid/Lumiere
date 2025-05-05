@@ -285,10 +285,11 @@ function Orders() {
                                     <div className="col-md-2 col-6 text-md-center mt-md-0 mt-3">
                                         <p className="item-total mb-0 fw-bold">₱{(item.price * item.quantity).toFixed(2)}</p>
                                     </div>
-                                    <div className="col-md-1 col-12 text-md-end mt-md-0 mt-3">
+                                    <div className="col-md-1 col-12 text-md mt-md-0 mt-3">
                                         <button 
                                             className="btn btn-outline-danger btn-sm"
                                             onClick={() => handleRemoveItem(item.id)}
+                                            style={{width:"4rem"}}
                                         >
                                             <i className="fa-solid fa-trash"></i>
                                         </button>

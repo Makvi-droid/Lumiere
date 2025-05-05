@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useOrder } from '../../add-to-cart/OrderContext';
 
-const Dashboard = () => {
+const Dashboard = ({ userId = null, limitDisplay = false }) => {
   const { orders, removeOrder, updateOrderStatus } = useOrder();
   const [displayOrders, setDisplayOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('All');
@@ -22,26 +22,37 @@ const Dashboard = () => {
   // Calculate order statistics and filter orders
   useEffect(() => {
     if (orders && Array.isArray(orders)) {
-      // Calculate stats
+      // First filter by user if a userId is provided
+      let filteredOrders = orders;
+      if (userId) {
+        filteredOrders = orders.filter(order => order.user && order.user.id === userId);
+      }
+      
+      // Calculate stats based on filtered orders
       const stats = {
-        total: orders.length,
-        pending: orders.filter(order => order.status === 'Pending').length,
-        completed: orders.filter(order => order.status === 'Completed').length,
-        processing: orders.filter(order =>
+        total: filteredOrders.length,
+        pending: filteredOrders.filter(order => order.status === 'Pending').length,
+        completed: filteredOrders.filter(order => order.status === 'Completed').length,
+        processing: filteredOrders.filter(order =>
           ['Confirmed', 'Preparing', 'Ready for Pickup', 'Out for Meet-up'].includes(order.status)
         ).length
       };
       setOrderStats(stats);
 
-      // Filter orders based on selected status
+      // Apply status filter
       if (statusFilter === 'All') {
-        setDisplayOrders([...orders].sort((a, b) => new Date(b.date) - new Date(a.date)));
+        setDisplayOrders([...filteredOrders].sort((a, b) => new Date(b.date) - new Date(a.date)));
       } else {
         setDisplayOrders(
-          [...orders]
+          [...filteredOrders]
             .filter(order => order.status === statusFilter)
             .sort((a, b) => new Date(b.date) - new Date(a.date))
         );
+      }
+      
+      // If we're in limited display mode, only show the latest few orders
+      if (limitDisplay && displayOrders.length > 3) {
+        setDisplayOrders(prev => prev.slice(0, 3));
       }
     } else {
       // If orders is undefined or not an array, set default values
@@ -53,7 +64,7 @@ const Dashboard = () => {
       });
       setDisplayOrders([]);
     }
-  }, [orders, statusFilter]);
+  }, [orders, statusFilter, userId, limitDisplay]);
 
   // Format date to a more readable format
   const formatDate = (dateString) => {
@@ -119,138 +130,148 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className={`${limitDisplay ? 'p-4' : 'p-8'} bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen`}>
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100 transform transition-transform hover:scale-[1.01]">
-          <h2 className="text-3xl font-bold mb-2 text-gray-800 flex items-center">
-            <span className="bg-blue-500 text-white p-2 rounded-lg mr-3">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </span>
-            Dashboard Overview
-          </h2>
-          <p className="text-gray-600 mb-6 ml-12">Monitor your business at a glance</p>
+        {!limitDisplay && (
+          <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100 transform transition-transform hover:scale-[1.01]">
+            <h2 className="text-3xl font-bold mb-2 text-gray-800 flex items-center">
+              <span className="bg-blue-500 text-white p-2 rounded-lg mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </span>
+              {userId ? 'My Orders' : 'Dashboard Overview'}
+            </h2>
+            <p className="text-gray-600 mb-6 ml-12">
+              {userId ? 'Track the status of your orders' : 'Monitor your business at a glance'}
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-blue-500 p-3 rounded-full mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-blue-500 p-3 rounded-full mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-800">Total Orders</h4>
+                      <p className="text-gray-600 text-sm">Lifetime</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-800">Total Orders</h4>
-                    <p className="text-gray-600 text-sm">Lifetime</p>
-                  </div>
+                  <div className="text-3xl font-bold text-blue-600">{orderStats.total}</div>
                 </div>
-                <div className="text-3xl font-bold text-blue-600">{orderStats.total}</div>
               </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-yellow-500 p-3 rounded-full mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+              
+              <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-yellow-500 p-3 rounded-full mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-800">Pending</h4>
+                      <p className="text-gray-600 text-sm">Awaiting action</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-800">Pending</h4>
-                    <p className="text-gray-600 text-sm">Awaiting action</p>
-                  </div>
+                  <div className="text-3xl font-bold text-yellow-600">{orderStats.pending}</div>
                 </div>
-                <div className="text-3xl font-bold text-yellow-600">{orderStats.pending}</div>
               </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-purple-500 p-3 rounded-full mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                    </svg>
+              
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-purple-500 p-3 rounded-full mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-800">Processing</h4>
+                      <p className="text-gray-600 text-sm">In progress</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-800">Processing</h4>
-                    <p className="text-gray-600 text-sm">In progress</p>
-                  </div>
+                  <div className="text-3xl font-bold text-purple-600">{orderStats.processing}</div>
                 </div>
-                <div className="text-3xl font-bold text-purple-600">{orderStats.processing}</div>
               </div>
-            </div>
-            
-            <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-green-500 p-3 rounded-full mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+              
+              <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl shadow-md transition-all hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-green-500 p-3 rounded-full mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-800">Completed</h4>
+                      <p className="text-gray-600 text-sm">Successfully delivered</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-800">Completed</h4>
-                    <p className="text-gray-600 text-sm">Successfully delivered</p>
-                  </div>
+                  <div className="text-3xl font-bold text-green-600">{orderStats.completed}</div>
                 </div>
-                <div className="text-3xl font-bold text-green-600">{orderStats.completed}</div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">Order Management</h3>
-            <p className="text-gray-600">Track and update your customer orders</p>
+            <h3 className="text-2xl font-bold text-gray-800">
+              {userId ? 'My Orders' : 'Order Management'}
+            </h3>
+            <p className="text-gray-600">
+              {userId ? 'View and track your orders' : 'Track and update your customer orders'}
+            </p>
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            <button 
-              onClick={() => setStatusFilter('All')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                statusFilter === 'All' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              All Orders
-            </button>
-            <button 
-              onClick={() => setStatusFilter('Pending')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                statusFilter === 'Pending' 
-                  ? 'bg-yellow-500 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Pending
-            </button>
-            <button 
-              onClick={() => setStatusFilter('Completed')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                statusFilter === 'Completed' 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Completed
-            </button>
-            <button 
-              onClick={() => setStatusFilter('Preparing')}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                statusFilter === 'Preparing' 
-                  ? 'bg-purple-500 text-white' 
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Preparing
-            </button>
-          </div>
+          {!limitDisplay && (
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setStatusFilter('All')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  statusFilter === 'All' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                All Orders
+              </button>
+              <button 
+                onClick={() => setStatusFilter('Pending')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  statusFilter === 'Pending' 
+                    ? 'bg-yellow-500 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Pending
+              </button>
+              <button 
+                onClick={() => setStatusFilter('Completed')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  statusFilter === 'Completed' 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Completed
+              </button>
+              <button 
+                onClick={() => setStatusFilter('Preparing')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  statusFilter === 'Preparing' 
+                    ? 'bg-purple-500 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Preparing
+              </button>
+            </div>
+          )}
         </div>
         
         <div className="space-y-8">
@@ -274,18 +295,20 @@ const Dashboard = () => {
                       <span className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusBadgeClass(order.status || 'Completed')}`}>
                         {order.status || 'Completed'}
                       </span>
-                      <select
-                        value={order.status || 'Completed'}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="border border-gray-300 rounded-lg py-2 pl-3 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Preparing">Preparing</option>
-                        <option value="Ready for Pickup">Ready for Pickup</option>
-                        <option value="Out for Meet-up">Out for Meet-up</option>
-                        <option value="Completed">Completed</option>
-                      </select>
+                      {!userId && (
+                        <select
+                          value={order.status || 'Completed'}
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          className="border border-gray-300 rounded-lg py-2 pl-3 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Preparing">Preparing</option>
+                          <option value="Ready for Pickup">Ready for Pickup</option>
+                          <option value="Out for Meet-up">Out for Meet-up</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      )}
                     </div>
                   </div>
                   
@@ -361,7 +384,6 @@ const Dashboard = () => {
                         Order Items
                       </h6>
                       
-                      
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {order.items && Array.isArray(order.items) ? (
                           order.items.map((item, index) => (
@@ -393,9 +415,7 @@ const Dashboard = () => {
                                   <p className="text-sm font-medium">{item.quantity} × ₱{formatPrice(item.price)}</p>
                                 </div>
                               </div>
-                              
                             </div>
-                            
                           ))
                         ) : (
                           <div className="col-span-full text-center py-4 text-gray-500">
@@ -406,33 +426,31 @@ const Dashboard = () => {
                     </div>
                   </div>
                   
-                  <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
-                    
-                    {order.status !== 'Completed' && (
+                  {!userId && (
+                    <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
+                      {order.status !== 'Completed' && (
+                        <button
+                          onClick={() => markAsDelivered(order.id)}
+                          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 shadow-sm"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Mark as Delivered
+                        </button>
+                      )}
                       <button
-                        onClick={() => markAsDelivered(order.id)}
-                        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 shadow-sm"
+                        onClick={() => removeOrder(order.id)}
+                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        Mark as Delivered
+                        Remove
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-                <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
-                    
-                    <button
-                      onClick={() => removeOrder(order.id)} // Call the removeOrder function
-                      className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                      Remove
-                    </button>
-                  </div>
               </div>
             ))
           ) : (
@@ -444,14 +462,27 @@ const Dashboard = () => {
               </div>
               <h3 className="text-2xl font-semibold text-gray-800 mb-3">No Orders Found</h3>
               <p className="text-gray-600 max-w-md mx-auto mb-6">
-                {statusFilter === 'All' 
-                  ? "You don't have any orders yet. Orders will appear here once customers place them."
-                  : `No orders with status "${statusFilter}" found. Try selecting a different status filter.`
+                {userId 
+                  ? "You haven't placed any orders yet. Your order history will appear here after you make a purchase."
+                  : statusFilter === 'All' 
+                    ? "You don't have any orders yet. Orders will appear here once customers place them."
+                    : `No orders with status "${statusFilter}" found. Try selecting a different status filter.`
                 }
               </p>
               <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md">
                 Browse Shop
               </button>
+            </div>
+          )}
+          
+          {limitDisplay && displayOrders.length > 0 && (
+            <div className="text-center mt-4">
+              <a href="/my-orders" className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                View all orders
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
             </div>
           )}
         </div>
