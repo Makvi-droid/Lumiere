@@ -7,12 +7,15 @@ import {
   UserCog,
   BarChart2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 
 const Sidebar = ({ activeSection, onNavigate, isSidebarOpen, setIsSidebarOpen }) => {
   // State for hover animations
   const [hoveredItem, setHoveredItem] = useState(null);
+  // State for logout confirmation dialog
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   
   // Navigation items with icons
   const navItems = [
@@ -34,17 +37,42 @@ const Sidebar = ({ activeSection, onNavigate, isSidebarOpen, setIsSidebarOpen })
     }
   };
 
-  // Handle escape key to close sidebar
+  // Handle escape key to close sidebar and logout dialog
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && isSidebarOpen) {
-        setIsSidebarOpen(false);
+      if (e.key === 'Escape') {
+        if (showLogoutConfirm) {
+          setShowLogoutConfirm(false);
+        } else if (isSidebarOpen) {
+          setIsSidebarOpen(false);
+        }
       }
     };
     
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [isSidebarOpen, setIsSidebarOpen]);
+  }, [isSidebarOpen, setIsSidebarOpen, showLogoutConfirm]);
+
+  // Handle logout confirmation
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  // Handle actual logout and navigation
+  const confirmLogout = () => {
+    // Close the dialog
+    setShowLogoutConfirm(false);
+    // Here you would typically clear authentication tokens/session
+    // For example: localStorage.removeItem('authToken');
+    
+    // Navigate to guest page
+    window.location.href = '/'; // Or use router if available: router.push('/');
+  };
+
+  // Cancel logout
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
+  };
 
   return (
     <>
@@ -163,20 +191,57 @@ const Sidebar = ({ activeSection, onNavigate, isSidebarOpen, setIsSidebarOpen })
                 <span className="text-lg font-bold text-white">A</span>
               </div>
               <div>
-               
                 <p className="text-xs text-gray-400">Administrator</p>
               </div>
             </div>
             
-            <a 
-              href="#" 
-              className="flex items-center justify-center w-full px-4 py-2 mt-2 text-sm rounded-lg text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors"
+            {/* Logout button */}
+            <button 
+              onClick={handleLogout}
+              className="flex items-center justify-center w-full px-4 py-2 mt-2 text-sm rounded-lg text-gray-300 hover:text-white hover:bg-red-600/80 transition-colors focus:outline-none"
             >
-              
-            </a>
+              <LogOut size={16} className="mr-2" />
+              <span>Log Out</span>
+            </button>
           </div>
         </nav>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <>
+          {/* Overlay */}
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 flex items-center justify-center">
+            {/* Dialog */}
+            <div className="bg-white rounded-lg shadow-xl w-80 max-w-md z-50 overflow-hidden transform transition-all">
+              <div className="px-6 py-4">
+                <div className="text-lg font-medium text-gray-900 mb-2">
+                  Confirm Logout
+                </div>
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to log out? You will be redirected to the guest page.
+                </p>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={confirmLogout}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Log Out
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelLogout}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };
