@@ -496,7 +496,7 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
 
                   
                   
-                  {!userId && (
+                  {!userId &&  (
                     <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
                       {order.status !== 'Completed' && (
                         <button
@@ -511,7 +511,7 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                       )}
 
                        {/* report issue button */}
-                       
+                       {!userId && (
                               <button
                                 onClick={() => {
                                   setCurrentOrder(order);
@@ -521,7 +521,7 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                               >
                                 Report Issue
                               </button>
-                          
+                       )}
                      
                       <button
                         onClick={() => {

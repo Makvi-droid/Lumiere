@@ -37,10 +37,10 @@ function Orders() {
 
     // Available locations for dropdown
     const locations = [
-        "Quezon City",
-        "Manila",
-        "Makati",
-        "Taguig",
+        "SM North EDSA – The Block Entrance",
+        "Ayala Technohub – Starbucks Front",
+        "McDonald’s Quezon Memorial Circle (near flagpole)",
+        "MRT North Avenue Station (Entrance near Trinoma)",
         "Pasig",
         "Mandaluyong",
         "Pasay",
