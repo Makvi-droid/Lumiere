@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../profile-page/cartContext';
-import { useProducts } from '../products-page/ProductContext'; // Import the ProductContext
+import { useProducts } from '../products-page/ProductContext'; 
 import './product-cards.css';
 import { assets } from './assets/assets';
 
 function Rings() {
   const { addToCart } = useCart();
-  const { productsData } = useProducts(); // Access the products data from context
+  const { productsData } = useProducts(); 
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productStock, setProductStock] = useState(0);
@@ -136,7 +136,7 @@ function Rings() {
                         {productStatus}
                       </span>
                       <p className="mt-2 fs-6">
-                        <strong>Available Stock:</strong> {productStock} {productStock === 1 ? 'unit' : 'units'}
+                        <strong>Available Stock:</strong> {productStock} 
                       </p>
                     </div>
                     
@@ -187,7 +187,7 @@ function Rings() {
             <div className="product-image-container">
               <img src={assets.ring1} 
                 className="card-img-top product-image" alt="Celestial Halo Ring" 
-                style={{ width: '200px', height: '200px', objectFit: 'cover' }}/>
+                style={{ width: '200px', height: '200px', objectFit: 'cover', border:"1px solid #050029" }}/>
             </div>
             <div className="card-body p-3 d-flex flex-column">
               <h5 className="card-title fw-bold mb-2">Celestial Halo</h5>

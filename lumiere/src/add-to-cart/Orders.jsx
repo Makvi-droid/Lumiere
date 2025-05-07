@@ -39,14 +39,27 @@ function Orders() {
     const locations = [
         "SM North EDSA – The Block Entrance",
         "Ayala Technohub – Starbucks Front",
-        "McDonald’s Quezon Memorial Circle (near flagpole)",
+        "Centris Station (MRT Quezon Ave exit area)",
         "MRT North Avenue Station (Entrance near Trinoma)",
-        "Pasig",
-        "Mandaluyong",
-        "Pasay",
-        "Parañaque",
-        "Caloocan",
-        "Marikina"
+        "SM City Manila (main entrance or inside the food court)",
+        "University Belt - McDonald's Mendiola",
+        "Robinsons Place Manila (Pedro Gil side)",
+        "Glorietta 4 (Ground Level near Mercury Drug)",
+        "Ayala MRT Station (Northbound side)",
+        "Greenbelt 3 (near Starbucks or Landmark walkway)",
+        "Robinsons Galleria (Ground floor entrance or Food Court)",
+        "Ortigas MRT Station (outside Jollibee)",
+        "SM Aura (main entrance near Watsons)",
+        "BGC High Street (Serendra side or Fully Booked area)",
+        "Venice Grand Canal Mall (main plaza near the fountain)",
+        "Shangri-La Plaza (Starbucks by MRT entrance)",
+        "SM Light Mall (at Boni MRT Station)",
+        "Mall of Asia (near Hypermarket or MOA Arena side)",
+        "LRT Libertad Station (Jollibee or Chowking area)",
+        "SM Sucat (Main Lobby near Watsons)",
+        "SM Bicutan (Building B ground entrance)",
+        "Marikina Sports Center (entrance area)",
+        "SM Marikina (main entrance or beside Watsons)"
     ];
    
     // Update userData when currentUser changes

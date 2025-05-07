@@ -1,509 +1,378 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Profile from './assets/profile.jpg';
-import { motion } from 'framer-motion';
 import { useOrder } from '../add-to-cart/OrderContext';
+import { useNavigate } from 'react-router-dom';
 import Dashboard from '../admin-page/components/Dashboard';
 
-function UserProfile() {
-    const navigate = useNavigate();
-    const { orders: allOrders, removeOrder } = useOrder(); // Make sure to get removeOrder from context
+const UserProfile = () => {
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    contactNumber: '',
+    location: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showOrderHistory, setShowOrderHistory] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
 
+  // Animation states
+  const [animateProfile, setAnimateProfile] = useState(false);
+
+  useEffect(() => {
+    // Trigger animation on mount
+    setAnimateProfile(true);
     
-    
-    const getCurrentUser = () => {
-        try {
-            const userJson = localStorage.getItem('currentUser');
-            return userJson ? JSON.parse(userJson) : null;
-        } catch (error) {
-            console.error("Error parsing currentUser from localStorage:", error);
-            return null;
-        }
-    };
-
-    const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
-    const [userData, setUserData] = useState({
-        name: currentUser?.username || "Guest",
-        phone: currentUser?.contactNum || '',
-        address: currentUser?.address || '',
-        email: currentUser?.email || ""
-    });
-
-    const [passwords, setPasswords] = useState({
-        currentPassword: '',
-        newPassword: '',
+    // Get user data from localStorage
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setFormData({
+        fullName: parsedUser.username || '',
+        email: parsedUser.email || '',
+        contactNumber: parsedUser.contactNum || '',
+        location: parsedUser.location || '',
+        password: '',
         confirmPassword: '',
-    });
+      });
+    } else {
+      // Redirect to login if no user is found
+      navigate('/');
+    }
+  }, [navigate]);
 
-    const [orders, setOrders] = useState([]);
-    const [activeTab, setActiveTab] = useState('profile');
-    const [isModalOpen, setIsModalOpen] = useState({
-        profile: false,
-        password: false,
-        logoutConfirmation: false
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
     });
+  };
 
-    const [toast, setToast] = useState({
-        visible: false,
-        message: '',
-        type: 'success'
-    });
+  const toggleEditMode = () => {
+    if (isEditing) {
+      // Reset form data if cancelling edit
+      setFormData({
+        fullName: user?.fullName || '',
+        email: user?.email || '',
+        contactNumber: user?.contactNumber || '',
+        location: user?.location || '',
+        password: '',
+        confirmPassword: '',
+      });
+    }
+    setIsEditing(!isEditing);
+  };
 
-    useEffect(() => {
-        if (currentUser && Array.isArray(allOrders)) {
-            setUserData(prevData => ({
-                ...prevData,
-                name: currentUser.username,
-                email: currentUser.email || prevData.email,
-                phone: currentUser.contactNum,
-                address: currentUser.address || prevData.address,
-            }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
     
-            const userOrders = allOrders.filter(order =>
-                order.user?.id === currentUser.id || order.id === currentUser.id
-            );
-            setOrders(userOrders);
-        }
-    }, [currentUser, allOrders]);
+    // Validate passwords match if changing password
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+
+    // Update user object
+    const updatedUser = {
+      ...user,
+      fullName: formData.fullName,
+      email: formData.email,
+      contactNumber: formData.contactNumber,
+      location: formData.location,
+    };
+
+    // If password is provided, update it
+    if (formData.password) {
+      updatedUser.password = formData.password;
+    }
+
+    // Save to localStorage
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
     
-    const handleProfileChange = (e) => {
-        const { id, value } = e.target;
-        setUserData(prev => ({
-            ...prev,
-            [id]: value
-        }));
-    };
+    // Update users array in localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const updatedUsers = users.map(u => u.id === user.id ? updatedUser : u);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
 
-    const handlePasswordChange = (e) => {
-        const { id, value } = e.target;
-        setPasswords(prev => ({
-            ...prev,
-            [id]: value
-        }));
-    };
+    // Update state
+    setUser(updatedUser);
+    setIsEditing(false);
 
-    const saveProfile = () => {
-        // Update user data in localStorage
-        if (currentUser) {
-            const updatedUser = {
-                ...currentUser,
-                username: userData.name,
-                email: userData.email,
-                contactNum: userData.phone,
-                address: userData.address
-            };
-            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-            setCurrentUser(updatedUser);
-        }
-        
-        displayToast("Profile updated successfully");
-        setIsModalOpen(prev => ({ ...prev, profile: false }));
-    };
+    // Show success message
+    alert('Profile updated successfully!');
+  };
 
-    const updatePassword = () => {
-        if (passwords.newPassword !== passwords.confirmPassword) {
-            displayToast("Passwords do not match", 'error');
-            return;
-        }
-        
-        // In a real app, you would validate current password and update it
-        // For this example, we'll just show a success message
-        displayToast("Password updated successfully");
-        setIsModalOpen(prev => ({ ...prev, password: false }));
-    };
+  const handleLogout = () => {
+    // Clear user from localStorage
+    localStorage.removeItem('currentUser');
+    
+    // Redirect to login page
+    navigate('/');
+  };
 
-    const handleLogout = () => {
-        setIsModalOpen(prevState => ({ ...prevState, logoutConfirmation: true }));
-    };
+  const switchTab = (tab) => {
+    setActiveTab(tab);
+  };
 
-    const confirmLogout = () => {
-        localStorage.removeItem('currentUser');
-        displayToast("Logged out successfully");
-        navigate('/');
-    };
-
-    const cancelLogout = () => {
-        setIsModalOpen(prevState => ({ ...prevState, logoutConfirmation: false }));
-    };
-
-    const displayToast = (message, type = 'success') => {
-        setToast({
-            visible: true,
-            message,
-            type
-        });
-
-        setTimeout(() => {
-            setToast(prev => ({ ...prev, visible: false }));
-        }, 3000);
-    };
-
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        try {
-            const date = new Date(dateString);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch (error) {
-            console.error('Error formatting date:', error);
-            return 'Invalid Date';
-        }
-    };
-
-    const getStatusBadgeClass = (status) => {
-        switch (status) {
-            case 'Pending':
-                return 'bg-yellow-200 text-yellow-800';
-            case 'Confirmed':
-                return 'bg-blue-200 text-blue-800';
-            case 'Preparing':
-                return 'bg-indigo-500 text-white';
-            case 'Ready for Pickup':
-                return 'bg-purple-500 text-white';
-            case 'Out for Meet-up':
-                return 'bg-pink-500 text-white';
-            case 'Completed':
-                return 'bg-green-500 text-white';
-            default:
-                return 'bg-gray-500 text-white';
-        }
-    };
-
-    const formatPrice = (price) => {
-        if (price === undefined || price === null) return '0.00';
-        if (typeof price === 'number') return price.toFixed(2);
-        if (typeof price === 'string' && !isNaN(parseFloat(price))) {
-            return parseFloat(price).toFixed(2);
-        }
-        return '0.00';
-    };
-
+  if (!user) {
     return (
-        <div className="min-h-screen bg-gray-100 pt-16">
-            {/* Toast Notification */}
-            {toast.visible && (
-                <div className={`fixed top-20 right-5 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-500 ease-in-out ${
-                    toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}
-                >
-                    {toast.message}
-                </div>
-            )}
-            
-            {/* Logout Confirmation Modal */}
-            {isModalOpen.logoutConfirmation && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-auto">
-                        <h3 className="text-lg font-bold mb-4">Confirm Logout</h3>
-                        <p className="text-gray-700 mb-6">Are you sure you want to log out?</p>
-                        <div className="flex justify-end space-x-3">
-                            <button 
-                                onClick={cancelLogout}
-                                className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button 
-                                onClick={confirmLogout}
-                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            <div className="container mx-auto px-4 py-8 mt-7">
-                <div className="flex flex-col md:flex-row gap-6">
-                    {/* Left Side - Profile Sidebar */}
-                    <div className="w-full md:w-1/4">
-                        <div className="bg-white rounded-2xl shadow-xl p-6 mb-6">
-                            <div className="flex flex-col items-center mb-6">
-                                <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
-                                    <img src={Profile} alt="Profile" className="w-full h-full object-cover" />
-                                </div>
-                                <h3 className="text-xl font-bold text-gray-800">{userData.name}</h3>
-                                <p className="text-gray-500">{userData.email}</p>
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <button 
-                                    onClick={() => setActiveTab('profile')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg flex items-center ${
-                                        activeTab === 'profile' 
-                                            ? 'bg-indigo-50 text-indigo-700' 
-                                            : 'hover:bg-gray-100 text-gray-700'
-                                    }`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    My Profile
-                                </button>
-                                
-                                <button 
-                                    onClick={() => setActiveTab('orders')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg flex items-center ${
-                                        activeTab === 'orders' 
-                                            ? 'bg-indigo-50 text-indigo-700' 
-                                            : 'hover:bg-gray-100 text-gray-700'
-                                    }`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                    </svg>
-                                    My Orders
-                                </button>
-                                
-                                <button 
-                                    onClick={() => setActiveTab('password')}
-                                    className={`w-full text-left px-4 py-3 rounded-lg flex items-center ${
-                                        activeTab === 'password' 
-                                            ? 'bg-indigo-50 text-indigo-700' 
-                                            : 'hover:bg-gray-100 text-gray-700'
-                                    }`}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                    </svg>
-                                    Change Password
-                                </button>
-                                
-                                <button 
-                                    onClick={handleLogout}
-                                    className="w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 flex items-center"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                    Logout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {/* Right Side - Content Area */}
-                    <div className="w-full md:w-3/4">
-                        {/* Profile Tab */}
-                        {activeTab === 'profile' && (
-                            <motion.div 
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="bg-white rounded-2xl shadow-xl"
-                            >
-                                <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
-                                    <h5 className="text-lg font-bold text-gray-800 flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        My Profile
-                                    </h5>
-                                    <button 
-                                        onClick={() => setIsModalOpen(prev => ({ ...prev, profile: true }))}
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                        Edit Profile
-                                    </button>
-                                </div>
-                                <div className="p-6">
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div>
-                                            <p className="text-sm text-gray-500 mb-1">Full Name</p>
-                                            <p className="font-medium text-gray-800">{userData.name}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500 mb-1">Email Address</p>
-                                            <p className="font-medium text-gray-800">{userData.email}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500 mb-1">Phone Number</p>
-                                            <p className="font-medium text-gray-800">{userData.phone || 'Not provided'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm text-gray-500 mb-1">Address</p>
-                                            <p className="font-medium text-gray-800">{userData.address || 'Not provided'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {/* Edit Profile Modal */}
-                                {isModalOpen.profile && (
-                                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                        <div className="bg-white rounded-lg p-6 w-full max-w-lg mx-auto">
-                                            <div className="flex justify-between items-center mb-6">
-                                                <h3 className="text-lg font-bold">Edit Profile</h3>
-                                                <button 
-                                                    onClick={() => setIsModalOpen(prev => ({ ...prev, profile: false }))}
-                                                    className="text-gray-500 hover:text-gray-700"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                                        Full Name
-                                                    </label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="name" 
-                                                        value={userData.name} 
-                                                        onChange={handleProfileChange}
-                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                                        Email Address
-                                                    </label>
-                                                    <input 
-                                                        type="email" 
-                                                        id="email" 
-                                                        value={userData.email} 
-                                                        onChange={handleProfileChange}
-                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                                                        Phone Number
-                                                    </label>
-                                                    <input 
-                                                        type="tel" 
-                                                        id="phone" 
-                                                        value={userData.phone} 
-                                                        onChange={handleProfileChange}
-                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                                                        Address
-                                                    </label>
-                                                    <textarea 
-                                                        id="address" 
-                                                        value={userData.address} 
-                                                        onChange={handleProfileChange}
-                                                        rows="3"
-                                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                                    ></textarea>
-                                                </div>
-                                            </div>
-                                            <div className="mt-6 flex justify-end">
-                                                <button 
-                                                    onClick={() => setIsModalOpen(prev => ({ ...prev, profile: false }))}
-                                                    className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors mr-3"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button 
-                                                    onClick={saveProfile}
-                                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                                                >
-                                                    Save Changes
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </motion.div>
-                        )}
-                        
-                        {/* Orders Tab */}
-                        {activeTab === 'orders' && (
-                            <motion.div 
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="bg-white rounded-2xl shadow-xl"
-                            >
-                                {/* Use Dashboard component to display user orders */}
-                                <Dashboard userId={currentUser?.userId} />
-                            </motion.div>
-                        )}
-                        
-                        {/* Password Tab */}
-                        {activeTab === 'password' && (
-                            <motion.div 
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="bg-white rounded-2xl shadow-xl"
-                            >
-                                <div className="px-6 py-5 border-b border-gray-200">
-                                    <h5 className="text-lg font-bold text-gray-800 flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                                        </svg>
-                                        Change Password
-                                    </h5>
-                                </div>
-                                <div className="p-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                                Current Password
-                                            </label>
-                                            <input 
-                                                type="password" 
-                                                id="currentPassword" 
-                                                value={passwords.currentPassword}
-                                                onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                                New Password
-                                            </label>
-                                            <input 
-                                                type="password" 
-                                                id="newPassword" 
-                                                value={passwords.newPassword}
-                                                onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                                Confirm New Password
-                                            </label>
-                                            <input 
-                                                type="password" 
-                                                id="confirmPassword" 
-                                                value={passwords.confirmPassword}
-                                                onChange={handlePasswordChange}
-                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="mt-6">
-                                        <button 
-                                            onClick={updatePassword}
-                                            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                                        >
-                                            Update Password
-                                        </button>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
     );
-}
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div 
+        className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-700 ease-in-out ${animateProfile ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+      >
+        {/* Header Section with User Cover */}
+        <div className="relative h-48 bg-gradient-to-r from-blue-400 to-indigo-600">
+          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <div className="absolute bottom-4 left-6 flex items-center">
+            <div className="h-24 w-24 rounded-full border-4 border-white bg-white shadow-lg overflow-hidden">
+              <div className="h-full w-full bg-gradient-to-br from-blue-300 to-indigo-400 flex items-center justify-center">
+                <span className="text-3xl font-bold text-white">
+                  {user.fullName?.charAt(0) || user.email?.charAt(0) || 'U'}
+                </span>
+              </div>
+            </div>
+            <div className="ml-4 text-white">
+              <h2 className="text-2xl font-bold">{user.fullName}</h2>
+              <p className="opacity-90">{user.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Navigation */}
+        <div className="border-b border-gray-200">
+          <nav className="px-6 -mb-px flex space-x-8">
+            <button
+              onClick={() => switchTab('profile')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'profile'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => switchTab('orders')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                activeTab === 'orders'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Order History
+            </button>
+          </nav>
+        </div>
+
+        {/* Content Area */}
+        <div className="p-6">
+          {activeTab === 'profile' ? (
+            <div className="transition-all duration-300 ease-in-out">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold text-gray-800">Personal Information</h3>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={toggleEditMode}
+                    className={`px-4 py-2 rounded-lg flex items-center transition-all duration-300 ${
+                      isEditing
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                    }`}
+                  >
+                    {isEditing ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancel
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        Edit Profile
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300 flex items-center"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700">
+                      Contact Number
+                    </label>
+                    <input
+                      type="tel"
+                      id="contactNumber"
+                      name="contactNumber"
+                      value={formData.contactNumber}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      id="location"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-2 border ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    />
+                  </div>
+                </div>
+
+                {isEditing && (
+                  <div className="border-t border-gray-200 pt-6 mt-6">
+                    <h4 className="text-lg font-medium text-gray-800 mb-4">Change Password</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                          New Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                          >
+                            {showPassword ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                          Confirm New Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                          <p className="text-sm text-red-600 mt-1">Passwords don't match</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {isEditing && (
+                  <div className="pt-4 flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700  flex items-center gap-2 shadow-md transform hover:scale-105 transition-transform"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Save Changes
+                    </button>
+                  </div>
+                )}
+              </form>
+            </div>
+          ) : (
+            <div className="transition-all duration-300 ease-in-out">
+              <h3 className="text-xl font-semibold text-gray-800 mb-6">Your Order History</h3>
+              <Dashboard userId={user.id} />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default UserProfile;
