@@ -8,8 +8,24 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
   const [displayOrders, setDisplayOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('All');
   const [isModalOpen, setModalOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState(null);
+  const [modalOrderId, setModalOrderId] = useState(null); // Track which order has an open modal
   const [description, setDescription] = useState('');
+  const [currentOrder, setCurrentOrder] = useState(null); // Added missing state variable
+
+  // Open report modal with the correct order
+  const openReportModal = (order) => {
+    setModalOrderId(order.id);
+    setCurrentOrder(order);
+    setModalOpen(true); // Set modal to open
+  };
+  
+  // Close report modal and reset state
+  const closeReportModal = () => {
+    setModalOrderId(null);
+    setCurrentOrder(null);
+    setDescription('');
+    setModalOpen(false); // Set modal to closed
+  };
 
   const [orderStats, setOrderStats] = useState({
     total: 0,
@@ -57,8 +73,8 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
         );
       }
       
-     
-      if (limitDisplay && displayOrders.length > 3) {
+      // Apply limit if needed
+      if (limitDisplay && filteredOrders.length > 3) {
         setDisplayOrders(prev => prev.slice(0, 3));
       }
     } else {
@@ -158,10 +174,8 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
       // Save to localStorage
       localStorage.setItem('orderReports', JSON.stringify(updatedReports));
       
-      // Reset form
-      setDescription('');
-      setCurrentOrder(null);
-      setModalOpen(false);
+      // Reset form and close modal
+      closeReportModal();
       
       // Optional: Show success message
       alert('Report submitted successfully');
@@ -465,38 +479,9 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                     </div>
                   </div>
 
-                  {isModalOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                      <div className="bg-white rounded-lg p-6 shadow-lg w-11/12 md:w-1/3">
-                        <h2 className="text-xl font-bold mb-4">Report an Issue</h2>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Describe the issue..."
-                          className="w-full border border-gray-300 rounded-lg p-2 h-24"
-                          required
-                        />
-                        <div className="flex justify-end mt-4">
-                          <button
-                            onClick={handleModalSubmit}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            Submit
-                          </button>
-                          <button
-                            onClick={() => setModalOpen(false)}
-                            className="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   
                   
-                  {!userId &&  (
+                  {!userId && (
                     <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
                       {order.status !== 'Completed' && (
                         <button
@@ -510,18 +495,15 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                         </button>
                       )}
 
-                       {/* report issue button */}
-                       {!userId && (
-                              <button
-                                onClick={() => {
-                                  setCurrentOrder(order);
-                                  setModalOpen(true);
-                                }}
-                                className="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-2 shadow-sm"
-                              >
-                                Report Issue
-                              </button>
-                       )}
+                      {/* report issue button */}
+                      {!userId && (
+                        <button
+                          onClick={() => openReportModal(order)}
+                          className="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-2 shadow-sm"
+                        >
+                          Report Issue
+                        </button>
+                      )}
                      
                       <button
                         onClick={() => {
@@ -533,15 +515,12 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                       >
                         Remove
                       </button>
-
-                      
                     </div>
                   )}
 
-                 
-                  
                   
                 </div>
+                
               </div>
             ))
           ) : (
@@ -560,9 +539,7 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                     : `No orders with status "${statusFilter}" found. Try selecting a different status filter.`
                 }
               </p>
-              <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                Browse Shop
-              </button>
+              
             </div>
           )}
           
@@ -577,8 +554,59 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
             </div>
           )}
         </div>
+      
+{/* Report Issue Modal */}
+{isModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 mx-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Report Issue with Order #{modalOrderId}</h3>
+        <button 
+          onClick={closeReportModal}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <div className="mb-4">
+        <label htmlFor="reportDescription" className="block text-sm font-medium text-gray-700 mb-1">
+          Issue Description
+        </label>
+        <textarea
+          id="reportDescription"
+          rows={4}
+          className="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Please describe the issue you're experiencing with this order..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        ></textarea>
+      </div>
+      
+      <div className="flex gap-3 justify-end">
+        <button
+          onClick={closeReportModal}
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleModalSubmit}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          disabled={!description.trim()}
+        >
+          Submit Report
+        </button>
       </div>
     </div>
+  </div>
+)}
+      </div>
+      
+      </div>
+    
   );
 };
 
