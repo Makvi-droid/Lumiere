@@ -14,8 +14,7 @@ function Navbar(){
                         <li><Link to={"/User"}>Home</Link></li>
                         <li><Link to={"/Products"}>Products</Link></li>
                         <li><Link to={"/Pages"}>About</Link></li>
-                        
-                        <li>Contact Us</li>
+                        <li><Link to={"/ContactUs"}>Contact Us</Link></li>
                         
                     </ul>
 

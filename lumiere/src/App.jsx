@@ -12,6 +12,7 @@ import Dashboard from './admin-page/components/Dashboard';
 import { ProductProvider } from './products-page/ProductContext';
 import Pages from './pages/Pages.Jsx';
 import MyOrders from './profile-page/MyOrders';
+import ContactUsMain from './contact-us-page/ContactUsMain';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -30,6 +31,7 @@ function App() {
           <Route path='/Dashboard' element={<Dashboard/>}/>
           <Route path='/MyOrders' element={<MyOrders/>}/>
           <Route path='/Pages' element={<Pages/>}/>
+          <Route path='/ContactUs' element={<ContactUsMain/>}/>
         </Routes>
       </CartProvider>
     </OrderProvider>

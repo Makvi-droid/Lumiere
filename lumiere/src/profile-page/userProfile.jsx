@@ -1,376 +1,432 @@
-import React, { useState, useEffect } from 'react';
-import { useOrder } from '../add-to-cart/OrderContext';
-import { useNavigate } from 'react-router-dom';
-import Dashboard from '../admin-page/components/Dashboard';
+import React, { useState, useEffect, useRef } from 'react';
 
 const UserProfile = () => {
-  const navigate = useNavigate();
+  
+  const [currentUser, setCurrentUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
     email: '',
-    contactNumber: '',
-    location: '',
-    password: '',
-    confirmPassword: '',
+    contactNum: '',
+    gender: '',
+    bio: '',
+    address: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showOrderHistory, setShowOrderHistory] = useState(false);
-  const [activeTab, setActiveTab] = useState('profile');
-
-  // Animation states
-  const [animateProfile, setAnimateProfile] = useState(false);
+  const [avatarHover, setAvatarHover] = useState(false);
+  const fileInputRef = useRef(null);
+  const [avatarImage, setAvatarImage] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 
   useEffect(() => {
-    // Trigger animation on mount
-    setAnimateProfile(true);
     
-    // Get user data from localStorage
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    // Fetch current user from localStorage
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
+      const user = JSON.parse(storedUser);
+      setCurrentUser(user);
+      
+      // Populate form data with user info
       setFormData({
-        fullName: parsedUser.username || '',
-        email: parsedUser.email || '',
-        contactNumber: parsedUser.contactNum || '',
-        location: parsedUser.location || '',
-        password: '',
-        confirmPassword: '',
+        username: user.username || '',
+        email: user.email || '',
+        contactNum: user.contactNum || '',
+        gender: user.gender || '',
+        bio: user.bio || 'Hi there! I am using the app.',
+        address: user.address || 'Manila, Philippines',
       });
     } else {
-      // Redirect to login if no user is found
-      navigate('/');
+     
+      const defaultUser = {
+        id: 1, 
+        username: "Sgt KatCat", 
+        password: "password123", 
+        role: "customer", 
+        contactNum: "09471057194", 
+        gender: "M", 
+        email: "katcat@example.com",
+        bio: "Hi there! I am using the app.",
+        address: "Manila, Philippines"
+      };
+      setCurrentUser(defaultUser);
+      
+      setFormData({
+        username: defaultUser.username,
+        email: defaultUser.email,
+        contactNum: defaultUser.contactNum,
+        gender: defaultUser.gender,
+        bio: defaultUser.bio,
+        address: defaultUser.address,
+      });
+      
+      // Store in localStorage for persistence
+      localStorage.setItem('currentUser', JSON.stringify(defaultUser));
     }
-  }, [navigate]);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const toggleEditMode = () => {
-    if (isEditing) {
-      // Reset form data if cancelling edit
-      setFormData({
-        fullName: user?.fullName || '',
-        email: user?.email || '',
-        contactNumber: user?.contactNumber || '',
-        location: user?.location || '',
-        password: '',
-        confirmPassword: '',
-      });
-    }
-    setIsEditing(!isEditing);
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validate passwords match if changing password
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match");
-      return;
+    // Update user in localStorage
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        username: formData.username,
+        email: formData.email,
+        contactNum: formData.contactNum,
+        gender: formData.gender,
+        bio: formData.bio,
+        address: formData.address,
+      };
+      
+      setCurrentUser(updatedUser);
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      // Exit edit mode
+      setIsEditing(false);
     }
+  };
 
-    // Update user object
-    const updatedUser = {
-      ...user,
-      fullName: formData.fullName,
-      email: formData.email,
-      contactNumber: formData.contactNumber,
-      location: formData.location,
-    };
+  const handleAvatarClick = () => {
+    fileInputRef.current.click();
+  };
 
-    // If password is provided, update it
-    if (formData.password) {
-      updatedUser.password = formData.password;
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatarImage(event.target.result);
+        // Save to localStorage
+        if (currentUser) {
+          const updatedUser = {
+            ...currentUser,
+            avatar: event.target.result
+          };
+          setCurrentUser(updatedUser);
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        }
+      };
+      reader.readAsDataURL(file);
     }
+  };
 
-    // Save to localStorage
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+  // Get avatar based on gender if no custom avatar is set
+  const getDefaultAvatar = () => {
+    if (avatarImage) return avatarImage;
+    if (currentUser?.avatar) return currentUser.avatar;
     
-    // Update users array in localStorage
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const updatedUsers = users.map(u => u.id === user.id ? updatedUser : u);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    // Instead of using external images, use a colored circle with initials
+    return null;
+  };
 
-    // Update state
-    setUser(updatedUser);
-    setIsEditing(false);
+  const getInitials = () => {
+    return formData.username 
+      ? formData.username.split(' ').map(name => name[0]).join('').toUpperCase().substring(0, 2)
+      : 'U';
+  };
 
-    // Show success message
-    alert('Profile updated successfully!');
+  const getAvatarBgColor = () => {
+    // Generate color based on username for consistency
+    const username = formData.username || 'User';
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+      hash = username.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = hash % 360;
+    return `hsl(${hue}, 70%, 60%)`;
   };
 
   const handleLogout = () => {
-    // Clear user from localStorage
+    setShowLogoutConfirmation(true);
+  };
+
+  const confirmLogout = () => {
+    // Clear user data from localStorage
     localStorage.removeItem('currentUser');
     
-    // Redirect to login page
-    navigate('/');
+    // Navigate to guest page
+    window.location.href = '/'; 
   };
 
-  const switchTab = (tab) => {
-    setActiveTab(tab);
+  const cancelLogout = () => {
+    setShowLogoutConfirmation(false);
   };
 
-  if (!user) {
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-blue-600 font-medium">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div 
-        className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-700 ease-in-out ${animateProfile ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-      >
-        {/* Header Section with User Cover */}
-        <div className="relative h-48 bg-gradient-to-r from-blue-400 to-indigo-600">
-          <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent"></div>
-          <div className="absolute bottom-4 left-6 flex items-center">
-            <div className="h-24 w-24 rounded-full border-4 border-white bg-white shadow-lg overflow-hidden">
-              <div className="h-full w-full bg-gradient-to-br from-blue-300 to-indigo-400 flex items-center justify-center">
-                <span className="text-3xl font-bold text-white">
-                  {user.fullName?.charAt(0) || user.email?.charAt(0) || 'U'}
-                </span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 transform transition-all hover:shadow-2xl">
+          <div className="relative h-48 sm:h-56 bg-gradient-to-r from-blue-400 to-purple-500">
+            {/* Edit Profile Button */}
+            <button 
+              onClick={() => setIsEditing(!isEditing)}
+              className="absolute top-4 right-4 bg-white bg-opacity-90 text-blue-600 hover:text-blue-800 font-medium py-2 px-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              {isEditing ? 'Cancel' : 'Edit Profile'}
+            </button>
+
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout}
+              className="absolute top-4 left-4 bg-white bg-opacity-90 text-red-600 hover:text-red-800 font-medium py-2 px-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+
+            {/* Profile Avatar */}
+            
+          </div>
+
+          <div className="pt-20 pb-8 px-8 sm:px-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-800">{currentUser?.username || 'User'}</h1>
+                <p className="text-gray-600 mt-1 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {formData.address}
+                </p>
               </div>
-            </div>
-            <div className="ml-4 text-white">
-              <h2 className="text-2xl font-bold">{user.fullName}</h2>
-              <p className="opacity-90">{user.email}</p>
             </div>
           </div>
         </div>
 
-        {/* Tabs Navigation */}
-        <div className="border-b border-gray-200">
-          <nav className="px-6 -mb-px flex space-x-8">
-            <button
-              onClick={() => switchTab('profile')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                activeTab === 'profile'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Profile
-            </button>
-            <button
-              onClick={() => switchTab('orders')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                activeTab === 'orders'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Order History
-            </button>
-          </nav>
-        </div>
-
-        {/* Content Area */}
-        <div className="p-6">
-          {activeTab === 'profile' ? (
-            <div className="transition-all duration-300 ease-in-out">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-800">Personal Information</h3>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={toggleEditMode}
-                    className={`px-4 py-2 rounded-lg flex items-center transition-all duration-300 ${
-                      isEditing
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
-                    }`}
+        {/* Profile Content */}
+        <div 
+          className="bg-white rounded-2xl shadow-lg p-8"
+        >
+          {isEditing ? (
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Username</label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Contact Number</label>
+                  <input
+                    type="text"
+                    name="contactNum"
+                    value={formData.contactNum}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Gender</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {isEditing ? (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        Cancel
-                      </>
-                    ) : (
-                      <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        Edit Profile
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300 flex items-center"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Logout
-                  </button>
+                    <option value="">Select Gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="O">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Address</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-gray-700 font-medium mb-2">Bio</label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    rows="4"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  ></textarea>
                 </div>
               </div>
+              <div className="mt-8 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(false)}
+                  className="mr-4 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md hover:shadow-lg"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">About Me</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {formData.bio}
+                </p>
+              </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700">
-                      Contact Number
-                    </label>
-                    <input
-                      type="tel"
-                      id="contactNumber"
-                      name="contactNumber"
-                      value={formData.contactNumber}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      id="location"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`w-full px-4 py-2 border ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
-                      } rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors`}
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Contact Information</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="font-medium text-gray-800">{formData.email}</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-gray-500">Phone</p>
+                        <p className="font-medium text-gray-800">{formData.contactNum}</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-gray-500">Address</p>
+                        <p className="font-medium text-gray-800">{formData.address}</p>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
 
-                {isEditing && (
-                  <div className="border-t border-gray-200 pt-6 mt-6">
-                    <h4 className="text-lg font-medium text-gray-800 mb-4">Change Password</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                          New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                          >
-                            {showPassword ? (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                              </svg>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                          Confirm New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            type={showPassword ? "text" : "password"}
-                            id="confirmPassword"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </div>
-                        {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                          <p className="text-sm text-red-600 mt-1">Passwords don't match</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {isEditing && (
-                  <div className="pt-4 flex justify-end">
-                    <button
-                      type="submit"
-                      className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700  flex items-center gap-2 shadow-md transform hover:scale-105 transition-transform"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Account Information</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      Save Changes
-                    </button>
-                  </div>
-                )}
-              </form>
-            </div>
-          ) : (
-            <div className="transition-all duration-300 ease-in-out">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">Your Order History</h3>
-              <Dashboard userId={user.id} />
+                      <div>
+                        <p className="text-sm text-gray-500">Username</p>
+                        <p className="font-medium text-gray-800">{formData.username}</p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-gray-500">Gender</p>
+                        <p className="font-medium text-gray-800">
+                          {formData.gender === 'M' ? 'Male' : formData.gender === 'F' ? 'Female' : 'Other'}
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500 mr-3 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-gray-500">Member Since</p>
+                        <p className="font-medium text-gray-800">May 2024</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 m-4 max-w-sm w-full">
+            <div className="text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Are you sure you want to log out?</h3>
+              <p className="text-gray-600 mb-6">You'll need to sign in again to access your account.</p>
+              
+              <div className="flex justify-center space-x-4">
+                <button 
+                  onClick={cancelLogout}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={confirmLogout}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Log Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
