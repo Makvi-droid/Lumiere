@@ -8,6 +8,8 @@ import Footer from "../user-landing-page/footer.jsx"
 import { ProductProvider } from "./ProductContext.jsx";
 
 
+
+
 function Products(){
     return(
         <>
@@ -19,7 +21,7 @@ function Products(){
             <Bracelets/>
             <Footer/>
             <Outlet/>
-            </ProductProvider>
+        </ProductProvider>
         </>
     );
 }

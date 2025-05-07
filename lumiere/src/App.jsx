@@ -10,6 +10,8 @@ import AdminPage from './admin-page/AdminPage';
 import { OrderProvider } from './add-to-cart/OrderContext';
 import Dashboard from './admin-page/components/Dashboard';
 import { ProductProvider } from './products-page/ProductContext';
+import Pages from './pages/Pages.Jsx';
+import MyOrders from './profile-page/MyOrders';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -26,6 +28,8 @@ function App() {
           <Route path='/AddToCart' element={<AddToCart />} />
           <Route path='/AdminPage' element={<AdminPage />} />
           <Route path='/Dashboard' element={<Dashboard/>}/>
+          <Route path='/MyOrders' element={<MyOrders/>}/>
+          <Route path='/Pages' element={<Pages/>}/>
         </Routes>
       </CartProvider>
     </OrderProvider>

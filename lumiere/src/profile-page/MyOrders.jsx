@@ -1,175 +1,138 @@
-import React, { useState, useEffect } from 'react';
-import { useOrder } from '../../add-to-cart/OrderContext';
-import { useNavigate } from 'react-router-dom';
+import React from 'react'
+import { useOrder } from '../add-to-cart/OrderContext';
 
+const MyOrders = ({ userId = null, limitDisplay = false }) => {
 
-const Dashboard = ({ userId = null, limitDisplay = false }) => {
-  const { orders, removeOrder, updateOrderStatus } = useOrder();
-  const [displayOrders, setDisplayOrders] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState(null);
-  const [description, setDescription] = useState('');
-
-  const [orderStats, setOrderStats] = useState({
-    total: 0,
-    pending: 0,
-    completed: 0,
-    processing: 0
-  });
-  const navigate = useNavigate();
-
-  // Save orders to localStorage on change
-  useEffect(() => {
-    if (orders && orders.length > 0) {
-      localStorage.setItem('dashboardOrders', JSON.stringify(orders));
-    }
-  }, [orders]);
-
-  // Calculate order statistics and filter orders
-  useEffect(() => {
-    if (orders && Array.isArray(orders)) {
-      // First filter by user if a userId is provided
-      let filteredOrders = orders;
-      if (userId) {
-        filteredOrders = orders.filter(order => order.user && order.user.id === userId);
-      }
-      
-      // Calculate stats based on filtered orders
-      const stats = {
-        total: filteredOrders.length,
-        pending: filteredOrders.filter(order => order.status === 'Pending').length,
-        completed: filteredOrders.filter(order => order.status === 'Completed').length,
-        processing: filteredOrders.filter(order =>
-          ['Confirmed', 'Preparing', 'Ready for Pickup', 'Out for Meet-up'].includes(order.status)
-        ).length
-      };
-      setOrderStats(stats);
-
-      // Apply status filter
-      if (statusFilter === 'All') {
-        setDisplayOrders([...filteredOrders].sort((a, b) => new Date(b.date) - new Date(a.date)));
-      } else {
-        setDisplayOrders(
-          [...filteredOrders]
-            .filter(order => order.status === statusFilter)
-            .sort((a, b) => new Date(b.date) - new Date(a.date))
-        );
-      }
-      
-     
-      if (limitDisplay && displayOrders.length > 3) {
-        setDisplayOrders(prev => prev.slice(0, 3));
-      }
-    } else {
-      // If orders is undefined or not an array, set default values
-      setOrderStats({
+    const { orders, removeOrder, updateOrderStatus } = useOrder();
+      const [displayOrders, setDisplayOrders] = useState([]);
+      const [statusFilter, setStatusFilter] = useState('All');
+      const [orderStats, setOrderStats] = useState({
         total: 0,
         pending: 0,
         completed: 0,
         processing: 0
       });
-      setDisplayOrders([]);
-    }
-  }, [orders, statusFilter, userId, limitDisplay]);
-
-  // Format date to a more readable format
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Invalid Date';
-    }
-  };
-
-  // Get status badge style based on status
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Confirmed':
-        return 'bg-blue-100 text-blue-800';
-      case 'Preparing':
-        return 'bg-purple-100 text-purple-800';
-      case 'Ready for Pickup':
-        return 'bg-indigo-100 text-indigo-800';
-      case 'Out for Meet-up':
-        return 'bg-pink-100 text-pink-800';
-      case 'Completed':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Handle status change
-  const handleStatusChange = (orderId, newStatus) => {
-    if (updateOrderStatus) {
-      updateOrderStatus(orderId, newStatus);
-    }
-  };
-
-  // Handle order delivery (mark as completed)
-  const markAsDelivered = (orderId) => {
-    if (updateOrderStatus) {
-      updateOrderStatus(orderId, 'Completed');
-    }
-  };
-
-
-  // Helper function to safely format price
-  const formatPrice = (price) => {
-    if (price === undefined || price === null) return '0.00';
-    if (typeof price === 'number') return price.toFixed(2);
-    // If price is a string that can be converted to a number
-    if (typeof price === 'string' && !isNaN(parseFloat(price))) {
-      return parseFloat(price).toFixed(2);
-    }
-    return '0.00';
-  };
-
-  const handleModalSubmit = () => {
-    if (currentOrder && description.trim()) {
-      // Create a report object
-      const report = {
-        id: `report-${Date.now()}`,
-        orderId: currentOrder.id,
-        orderInfo: currentOrder,
-        description: description,
-        date: new Date().toISOString(),
-        status: 'Pending Review'
+    
+      // Save orders to localStorage on change
+      useEffect(() => {
+        if (orders && orders.length > 0) {
+          localStorage.setItem('dashboardOrders', JSON.stringify(orders));
+        }
+      }, [orders]);
+    
+      // Calculate order statistics and filter orders
+      useEffect(() => {
+        if (orders && Array.isArray(orders)) {
+          // First filter by user if a userId is provided
+          let filteredOrders = orders;
+          if (userId) {
+            filteredOrders = orders.filter(order => order.user && order.user.id === userId);
+          }
+          
+          // Calculate stats based on filtered orders
+          const stats = {
+            total: filteredOrders.length,
+            pending: filteredOrders.filter(order => order.status === 'Pending').length,
+            completed: filteredOrders.filter(order => order.status === 'Completed').length,
+            processing: filteredOrders.filter(order =>
+              ['Confirmed', 'Preparing', 'Ready for Pickup', 'Out for Meet-up'].includes(order.status)
+            ).length
+          };
+          setOrderStats(stats);
+    
+          // Apply status filter
+          if (statusFilter === 'All') {
+            setDisplayOrders([...filteredOrders].sort((a, b) => new Date(b.date) - new Date(a.date)));
+          } else {
+            setDisplayOrders(
+              [...filteredOrders]
+                .filter(order => order.status === statusFilter)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+            );
+          }
+          
+         
+          if (limitDisplay && displayOrders.length > 3) {
+            setDisplayOrders(prev => prev.slice(0, 3));
+          }
+        } else {
+          // If orders is undefined or not an array, set default values
+          setOrderStats({
+            total: 0,
+            pending: 0,
+            completed: 0,
+            processing: 0
+          });
+          setDisplayOrders([]);
+        }
+      }, [orders, statusFilter, userId, limitDisplay]);
+    
+      // Format date to a more readable format
+      const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        try {
+          const date = new Date(dateString);
+          return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } catch (error) {
+          console.error('Error formatting date:', error);
+          return 'Invalid Date';
+        }
       };
-      
-      // Get existing reports from localStorage
-      const existingReports = JSON.parse(localStorage.getItem('orderReports') || '[]');
-      
-      // Add new report
-      const updatedReports = [...existingReports, report];
-      
-      // Save to localStorage
-      localStorage.setItem('orderReports', JSON.stringify(updatedReports));
-      
-      // Reset form
-      setDescription('');
-      setCurrentOrder(null);
-      setModalOpen(false);
-      
-      // Optional: Show success message
-      alert('Report submitted successfully');
-    }
-  };
+    
+      // Get status badge style based on status
+      const getStatusBadgeClass = (status) => {
+        switch (status) {
+          case 'Pending':
+            return 'bg-yellow-100 text-yellow-800';
+          case 'Confirmed':
+            return 'bg-blue-100 text-blue-800';
+          case 'Preparing':
+            return 'bg-purple-100 text-purple-800';
+          case 'Ready for Pickup':
+            return 'bg-indigo-100 text-indigo-800';
+          case 'Out for Meet-up':
+            return 'bg-pink-100 text-pink-800';
+          case 'Completed':
+            return 'bg-green-100 text-green-800';
+          default:
+            return 'bg-gray-100 text-gray-800';
+        }
+      };
+    
+      // Handle status change
+      const handleStatusChange = (orderId, newStatus) => {
+        if (updateOrderStatus) {
+          updateOrderStatus(orderId, newStatus);
+        }
+      };
+    
+      // Handle order delivery (mark as completed)
+      const markAsDelivered = (orderId) => {
+        if (updateOrderStatus) {
+          updateOrderStatus(orderId, 'Completed');
+        }
+      };
+    
+      // Helper function to safely format price
+      const formatPrice = (price) => {
+        if (price === undefined || price === null) return '0.00';
+        if (typeof price === 'number') return price.toFixed(2);
+        // If price is a string that can be converted to a number
+        if (typeof price === 'string' && !isNaN(parseFloat(price))) {
+          return parseFloat(price).toFixed(2);
+        }
+        return '0.00';
+      };
 
   return (
-    <div className={`${limitDisplay ? 'p-4' : 'p-8'} bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen`}>
+    <>
+        <div className={`${limitDisplay ? 'p-4' : 'p-8'} bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen`}>
       <div className="max-w-7xl mx-auto">
         {!limitDisplay && (
           <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100 transform transition-transform hover:scale-[1.01]">
@@ -464,37 +427,6 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                       </div>
                     </div>
                   </div>
-
-                  {isModalOpen && (
-                    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                      <div className="bg-white rounded-lg p-6 shadow-lg w-11/12 md:w-1/3">
-                        <h2 className="text-xl font-bold mb-4">Report an Issue</h2>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Describe the issue..."
-                          className="w-full border border-gray-300 rounded-lg p-2 h-24"
-                          required
-                        />
-                        <div className="flex justify-end mt-4">
-                          <button
-                            onClick={handleModalSubmit}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                          >
-                            Submit
-                          </button>
-                          <button
-                            onClick={() => setModalOpen(false)}
-                            className="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  
                   
                   {!userId && (
                     <div className="pt-4 border-t border-gray-200 flex flex-wrap gap-3">
@@ -509,38 +441,17 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
                           Mark as Delivered
                         </button>
                       )}
-
-                       {/* report issue button */}
-                       
-                              <button
-                                onClick={() => {
-                                  setCurrentOrder(order);
-                                  setModalOpen(true);
-                                }}
-                                className="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors flex items-center gap-2 shadow-sm"
-                              >
-                                Report Issue
-                              </button>
-                          
-                     
                       <button
-                        onClick={() => {
-                         if (removeOrder) {
-                            removeOrder(order.id);
-                          }
-                        }}
-                        className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 shadow-sm"
+                        onClick={() => removeOrder(order.id)}
+                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 shadow-sm"
                       >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                         Remove
                       </button>
-
-                      
                     </div>
                   )}
-
-                 
-                  
-                  
                 </div>
               </div>
             ))
@@ -579,7 +490,8 @@ const Dashboard = ({ userId = null, limitDisplay = false }) => {
         </div>
       </div>
     </div>
-  );
-};
+    </>
+  )
+}
 
-export default Dashboard;
+export default MyOrders

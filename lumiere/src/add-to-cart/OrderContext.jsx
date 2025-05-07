@@ -7,6 +7,7 @@ export const useOrder = () => {
     return useContext(OrderContext);
 };
 
+
 export const OrderProvider = ({ children }) => {
     const [orders, setOrders] = useState(() => {
         const saved = localStorage.getItem('orders');
@@ -14,23 +15,30 @@ export const OrderProvider = ({ children }) => {
     });
 
     const addOrder = (order) => {
-        // Generate a unique ID for the order
+        console.log("Adding order:", order); 
         const orderId = `order-${Date.now()}`;
+        const currentUserId = order.user?.id || localStorage.getItem('currentUserId'); // Optional fallback
+    
         const orderWithId = {
             ...order,
+            user: {
+                ...order.user,
+                id: currentUserId  // 💡 force include user.id
+            },
             id: orderId,
             status: 'Pending',
             createdAt: new Date().toISOString()
         };
-
+    
         setOrders((prevOrders) => {
             const updatedOrders = [...prevOrders, orderWithId];
             localStorage.setItem('orders', JSON.stringify(updatedOrders));
             return updatedOrders;
         });
-        
+    
         return orderId;
     };
+    
 
     const removeOrder = (id) => {
         setOrders((prevOrders) => {

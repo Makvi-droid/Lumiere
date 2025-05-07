@@ -7,6 +7,8 @@ import Customers from './components/Customers';
 import Products from './components/Products';
 import UserManagement from './components/UserManagement';
 import { OrderProvider } from '../add-to-cart/OrderContext';
+import Reports from './components/Reports'
+
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -130,6 +132,12 @@ const AdminPage = () => {
         return (
           <ErrorBoundary>
             <UserManagement />
+          </ErrorBoundary>
+        );
+        case 'reports':
+        return (
+          <ErrorBoundary>
+            <Reports/>
           </ErrorBoundary>
         );
       default:

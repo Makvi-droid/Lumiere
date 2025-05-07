@@ -26,6 +26,8 @@ function Orders() {
         address: currentUser?.address || "Quezon City",
     });
 
+    const [isClearCartConfirmationOpen, setIsClearCartConfirmationOpen] = useState(false);
+
     // Checkout form state
     const [checkoutData, setCheckoutData] = useState({
         fullName: currentUser?.username || "",
@@ -65,11 +67,23 @@ function Orders() {
     }, []);
 
     const handleCheckoutChange = (e) => {
+        
         const { id, value } = e.target;
         setCheckoutData((prevState) => ({
             ...prevState,
             [id]: value,
         }));
+    };
+
+    // Show confirmation modal before clearing cart
+    const handleClearCart = () => {
+        setIsClearCartConfirmationOpen(true);
+    };
+
+    const confirmClearCart = () => {
+        clearCart();
+        setIsClearCartConfirmationOpen(false); // Close the confirmation modal
+        displayToast("Cart cleared successfully");
     };
 
     const handleQuantityChange = (id, newQuantity) => {
@@ -153,6 +167,25 @@ function Orders() {
                     </div>
                     <div className="toast-body" id="toastMessage">
                         Action completed successfully.
+                    </div>
+                </div>
+            </div>
+
+            {/* Clear Cart Confirmation Modal */}
+            <div className="modal fade" id="clearCartModal" tabIndex="-1" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header bg-warning">
+                            <h5 className="modal-title">Confirm Clear Cart</h5>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <p>Are you sure you want to clear your cart? This action cannot be undone.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-danger" onClick={confirmClearCart}>Clear Cart</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -314,7 +347,15 @@ function Orders() {
                                         </span>
                                     </h5>
                                     <div className="btn-group">
-                                        <button className="btn btn-outline-secondary" onClick={clearCart}>Clear Cart</button>
+                                        <button 
+                                            className="btn btn-outline-secondary" 
+                                            onClick={() => {
+                                                const clearCartModal = new window.bootstrap.Modal(document.getElementById('clearCartModal'));
+                                                clearCartModal.show();
+                                            }}
+                                        >
+                                            Clear Cart
+                                        </button>
                                         <button className="btn btn-primary" onClick={handleCheckout}>Checkout</button>
                                     </div>
                                 </div>
