@@ -135,7 +135,7 @@ export const products = [
         category: 'Rings',
         subCategory: 'Formal',
         bestSeller: true
-    },
+    },    
     {
         id: 'necklace1',
         name: "Aurora Strand",
