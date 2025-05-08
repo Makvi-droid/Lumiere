@@ -32,13 +32,13 @@ function Orders() {
     const [checkoutData, setCheckoutData] = useState({
         fullName: currentUser?.username || "",
         contactNumber: userData.phone || "",
-        location: "Quezon City"
+        location: "SM North EDSA  The Block Entrance" || location.locations
     });
 
     // Available locations for dropdown
     const locations = [
-        "SM North EDSA – The Block Entrance",
-        "Ayala Technohub – Starbucks Front",
+        "SM North EDSA  The Block Entrance",
+        "Ayala Technohub  Starbucks Front",
         "Centris Station (MRT Quezon Ave exit area)",
         "MRT North Avenue Station (Entrance near Trinoma)",
         "SM City Manila (main entrance or inside the food court)",

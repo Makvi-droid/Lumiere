@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { products as initialProducts } from './assets/assets'; // Fixed import path
+import { products as initialProducts } from './assets/assets';
 
 // Create Context
 export const ProductContext = createContext();
@@ -73,18 +73,6 @@ export const ProductProvider = ({ children }) => {
     }
   };
 
-  // Add a new product
-  const addProduct = (newProduct) => {
-    // Ensure the new product has all required fields including stock and status
-    const productWithStatus = {
-      ...newProduct,
-      stock: newProduct.stock || 0,
-      status: newProduct.stock > 10 ? 'In Stock' : newProduct.stock > 0 ? 'Low Stock' : 'Out of Stock'
-    };
-    
-    setProductsData(prev => [...prev, productWithStatus]);
-  };
-
   // Get product by ID
   const getProductById = (id) => {
     return productsData.find(product => product.id === id);
@@ -99,7 +87,6 @@ export const ProductProvider = ({ children }) => {
       handleStockChange,
       deleteProduct,
       editProduct,
-      addProduct,
       getProductById
     }}>
       {children}
