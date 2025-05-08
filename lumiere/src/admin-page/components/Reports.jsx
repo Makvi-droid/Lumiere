@@ -112,10 +112,10 @@ const Reports = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </span>
-            Order Issue Reports
+            Product Issue Reports
           </h2>
           <p className="text-gray-600 mb-6 ml-12">
-            Review and manage customer reported issues with completed orders
+            Review and manage product reports with completed orders
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -199,7 +199,7 @@ const Reports = () => {
         <div className="mb-8 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
             <h3 className="text-2xl font-bold text-gray-800">Issue Reports</h3>
-            <p className="text-gray-600">Manage and respond to customer reported issues</p>
+            <p className="text-gray-600">Manage and respond to product reports</p>
           </div>
           
           <div className="flex flex-wrap gap-2">
@@ -287,7 +287,7 @@ const Reports = () => {
                   <div className="grid md:grid-cols-2 gap-8 mb-6">
                     <div>
                       <div className="bg-red-50 p-4 rounded-lg mb-6">
-                        <h6 className="font-semibold text-gray-800 mb-2">Customer Issue Report</h6>
+                        <h6 className="font-semibold text-gray-800 mb-2">Product Report</h6>
                         <p className="text-gray-700">{report.description}</p>
                         <div className="mt-3 text-sm text-gray-500">
                           Reported on {formatDate(report.date)}

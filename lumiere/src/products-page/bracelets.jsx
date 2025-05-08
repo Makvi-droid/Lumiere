@@ -84,7 +84,7 @@ function Bracelets() {
 
   return (
    <>
-     <h1 className="text-center my-5 fw-bold">EARRINGS</h1>
+     <h1 className="text-center my-5 fw-bold" style={{fontFamily:"Cinzel Decorative"}}>EARRINGS</h1>
            
            {/* Add to Cart Toast Notification */}
       <div className="toast-container position-fixed top-0 end-0 p-3">

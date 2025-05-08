@@ -8,12 +8,12 @@ const Customers = () => {
   
   // Initial user data from SignUp.jsx
   const initialUsers = [
-    { id: 1, username: "Sgt KatCat", password: "password123", role: "customer", email: "katcat@example.com", phone: "555-123-4567", joined: "2025-01-15", orders: 0, status: "Active" },
-    { id: 2, username: "Biscoff", password: "password123", role: "customer", email: "biscoff@example.com", phone: "555-234-5678", joined: "2025-02-10", orders: 0, status: "Active" },
-    { id: 3, username: "McJobilat", password: "password123", role: "customer", email: "mcjobilat@example.com", phone: "555-345-6789", joined: "2025-02-22", orders: 0, status: "Active" },
-    { id: 4, username: "Gandalf", password: "password123", role: "customer", email: "gandalf@example.com", phone: "555-456-7890", joined: "2025-03-05", orders: 0, status: "Active" },
-    { id: 5, username: "Ryan Reynolds", password: "password123", role: "customer", email: "reynolds@example.com", phone: "555-567-8901", joined: "2025-03-18", orders: 0, status: "Active" },
-    { id: 6, username: "admin", password: "adminpass", role: "admin", email: "admin@example.com", phone: "555-987-6543", joined: "2025-01-01", orders: 0, status: "Active" }
+    { id: 1, username: "Sgt KatCat", password: "password123", role: "customer", email: "katcat@example.com", phone: "09471057194", joined: "2025-01-15", orders: 0, status: "Active" },
+    { id: 2, username: "Biscoff", password: "password123", role: "customer", email: "biscoff@example.com", phone: "09671710194", joined: "2025-02-10", orders: 0, status: "Active" },
+    { id: 3, username: "McJobilat", password: "password123", role: "customer", email: "mcjobilat@example.com", phone: "09978057196", joined: "2025-02-22", orders: 0, status: "Active" },
+    { id: 4, username: "Gandalf", password: "password123", role: "customer", email: "gandalf@example.com", phone: "09841017194", joined: "2025-03-05", orders: 0, status: "Active" },
+    { id: 5, username: "Ryan Reynolds", password: "password123", role: "customer", email: "reynolds@example.com", phone: "09334718564", joined: "2025-03-18", orders: 0, status: "Active" },
+    { id: 6, username: "admin", password: "adminpass", role: "admin", email: "admin@example.com", phone: "09471057194", joined: "2025-01-01", orders: 0, status: "Active" }
   ];
 
   // State management
@@ -324,7 +324,7 @@ const Customers = () => {
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                <th className="hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                 <th className="hidden lg:table-cell px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
                 <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>

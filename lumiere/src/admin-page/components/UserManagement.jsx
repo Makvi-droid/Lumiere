@@ -581,7 +581,7 @@ const UserManagement = () => {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && userToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 gap-4">
           <div className="bg-white rounded-lg p-6 shadow-xl max-w-md w-full">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Confirm Delete</h3>
             <p className="text-gray-600 mb-6">

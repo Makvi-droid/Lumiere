@@ -3,10 +3,10 @@ import Navbar from './navbar.jsx';
 import Content from './content.jsx';
 import AboutUs from './aboutUs.jsx';
 import Product from './product.jsx';
-import ContactUs from './contactUs.jsx';
 import Developers from './developers.jsx';
 import Footer from './footer.jsx';
 import { Outlet } from 'react-router-dom';
+import ExtraContent from './ExtraContent.jsx';
 
 
 function User({ currentUser }) {
@@ -45,7 +45,7 @@ function User({ currentUser }) {
       <Content />
       <AboutUs />
       <Product />
-      <ContactUs />
+      <ExtraContent/>
       <Developers />
       <Footer />
       <Outlet />

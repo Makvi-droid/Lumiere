@@ -7,6 +7,7 @@ import ContactUs from './contactUs.jsx';
 import Developers from './developers.jsx';
 import Footer from './footer.jsx';
 import SignUp from './signUp.jsx';
+import ExtraContent from '../user-landing-page/ExtraContent.jsx';
 
 function Guest({ setCurrentUser }) {
   const signUpRef = useRef(null); 
@@ -24,7 +25,7 @@ function Guest({ setCurrentUser }) {
       <Content />
       <AboutUs />
       <Product />
-      <ContactUs />
+      <ExtraContent />
       <Developers />
       <Footer />
     </>

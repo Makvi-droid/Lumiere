@@ -85,7 +85,7 @@ function Necklaces() {
 
   return (
     <div className="container-fluid py-3">
-       <h1 className="text-center my-5 fw-bold">NECKLACES</h1>
+       <h1 className="text-center my-5 fw-bold" style={{fontFamily:"Cinzel Decorative"}}>NECKLACES</h1>
                  
                  {/* Add to Cart Toast Notification */}
       <div className="toast-container position-fixed top-0 end-0 p-3">
