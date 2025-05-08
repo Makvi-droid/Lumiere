@@ -6,7 +6,7 @@ import Necklaces from "./necklaces.jsx";
 import Bracelets from "./bracelets.jsx";
 import Footer from "../user-landing-page/footer.jsx"
 import { ProductProvider } from "./ProductContext.jsx";
-
+import FeaturedJewelrySection from "./FeaturedJewelrySection.jsx";
 
 
 
@@ -16,6 +16,7 @@ function Products(){
         <ProductProvider>
             <Navbar />  
             <Contents/> 
+            <FeaturedJewelrySection/>
             <Rings/>
             <Necklaces/>
             <Bracelets/>

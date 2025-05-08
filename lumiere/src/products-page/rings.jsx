@@ -378,6 +378,8 @@ function Rings() {
             </div>
           </div>
         </div>
+
+        
       </div>
     </>
   );
