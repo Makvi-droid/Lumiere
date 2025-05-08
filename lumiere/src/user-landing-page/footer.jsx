@@ -17,7 +17,7 @@ function Footer() {
 
                 <div className="footer-section">
                     <h3>Location</h3>
-                    <p>123 Anywhere ST., Any City, ST 12345</p>
+                    <p>938 Aurora Blvd, Cubao, Quezon City, 1109 Metro Manila</p>
                 </div>
 
                

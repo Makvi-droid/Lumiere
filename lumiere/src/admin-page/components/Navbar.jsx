@@ -53,9 +53,7 @@ const Navbar = ({ username, setIsSidebarOpen }) => {
             </svg>
           </button>
           
-          <span className="text-lg font-semibold hidden sm:block">
-            {username ? `Welcome, ${username}` : 'Guest Portal'}
-          </span>
+      
         </div>
 
         {/* Right-side icons */}
@@ -93,7 +91,7 @@ const Navbar = ({ username, setIsSidebarOpen }) => {
               <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
                 {username ? username[0].toUpperCase() : 'A'}
               </div>
-              <span className="hidden sm:inline">{username || 'Guest'}</span>
+              
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>

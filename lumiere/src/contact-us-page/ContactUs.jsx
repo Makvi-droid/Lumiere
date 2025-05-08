@@ -55,7 +55,7 @@ const ContactUs = () => {
           }, {
             icon: <MapPin size={36} />,
             label: "Location",
-            value: "123 Sparkle Street, Gem City, CA"
+            value: "938 Aurora Blvd, Cubao, Quezon City, 1109 Metro Manila"
           }].map(({ icon, label, value }, index) => (
             <motion.div
               key={index}
